@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>For Nicole</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ── THEME VARIABLES ── */
+  :root {
+    --cream:      #f7f0e8;
+    --cream-2:    #ede2d2;
+    --mocha:      #7a5a44;
+    --mocha-deep: #5a3f2d;
+    --espresso:   #3a2618;
+    --rose:       #c98a7d;
+    --blush:      #e7c6bd;
+    --gold:       #b08968;
+    --gold-light: #d4aa88;
+    --bg:         #f7f0e8;
+    --text:       #3a2618;
+    --text-soft:  #7a5a44;
+    --card-bg:    rgba(255,255,255,.55);
+    --divider:    #d4aa88;
+  }
+  body.night {
+    --bg:        #07091a;
+    --text:      #e8e0f0;
+    --text-soft: #b8aed0;
+    --mocha:     #b8aed0;
+    --mocha-deep:#e8e0f0;
+    --espresso:  #f0ecf8;
+    --gold:      #c8a8e8;
+    --gold-light:#a888cc;
+    --rose:      #d4a0c8;
+    --card-bg:   rgba(20,15,40,.6);
+    --divider:   #6040a0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Cormorant Garamond', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 2s ease, color 2s ease;
+  }
+
+  /* ── NIGHT SKY CANVAS ── */
+  #nightSky {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 3s ease;
+  }
+  body.night #nightSky { opacity: 1; }
+
+  /* ── AURORA LAYERS ── */
+  .aurora-wrap {
+    position: fixed; inset: 0; z-index: 0;
+    pointer-events: none; overflow: hidden;
+    opacity: 0; transition: opacity 3s ease;
+  }
+  body.night .aurora-wrap { opacity: 1; }
+  .aurora {
+    position: absolute; left: -20%; width: 140%; height: 55%;
+    border-radius: 50%;
+    filter: blur(60px);
+    mix-blend-mode: screen;
+    animation: aurora-drift linear infinite;
+  }
+  .aurora-1 {
+    top: -8%; height: 38%;
+    background: linear-gradient(180deg, transparent 0%, rgba(80,220,160,.18) 40%, rgba(60,180,220,.14) 70%, transparent 100%);
+    animation-duration: 28s; animation-delay: 0s;
+  }
+  .aurora-2 {
+    top: 5%; height: 32%;
+    background: linear-gradient(180deg, transparent 0%, rgba(160,80,220,.14) 40%, rgba(80,160,220,.1) 70%, transparent 100%);
+    animation-duration: 36s; animation-delay: -12s;
+  }
+  .aurora-3 {
+    top: -4%; height: 28%;
+    background: linear-gradient(180deg, transparent 0%, rgba(220,120,180,.1) 50%, transparent 100%);
+    animation-duration: 44s; animation-delay: -22s;
+  }
+  @keyframes aurora-drift {
+    0%   { transform: translateX(-10%) scaleY(1) skewX(-4deg); }
+    25%  { transform: translateX(5%)  scaleY(1.12) skewX(3deg); }
+    50%  { transform: translateX(12%) scaleY(.94) skewX(-2deg); }
+    75%  { transform: translateX(2%)  scaleY(1.08) skewX(4deg); }
+    100% { transform: translateX(-10%) scaleY(1) skewX(-4deg); }
+  }
+
+  /* ── NEBULA BLOBS ── */
+  .blobs { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .blob  { position: absolute; border-radius: 50%; filter: blur(80px); transition: background 2.5s ease, opacity 2s ease; }
+
+  /* Day blobs */
+  .blob-1 { width:700px; height:500px; background:#e8c4a8; opacity:.35; top:-150px; left:-200px; animation: drift1 18s ease-in-out infinite alternate; }
+  .blob-2 { width:600px; height:600px; background:#dbb89a; opacity:.35; top:30%; right:-200px; animation: drift2 22s ease-in-out infinite alternate; }
+  .blob-3 { width:500px; height:400px; background:#c9a088; opacity:.35; bottom:-100px; left:20%; animation: drift1 15s ease-in-out infinite alternate-reverse; }
+
+  body.night .blob-1 { background: rgba(100,60,180,.55); opacity:.5; }
+  body.night .blob-2 { background: rgba(60,30,140,.5);  opacity:.45; }
+  body.night .blob-3 { background: rgba(140,40,120,.45); opacity:.4; }
+
+  @keyframes drift1 { from{transform:translate(0,0) scale(1)} to{transform:translate(40px,30px) scale(1.08)} }
+  @keyframes drift2 { from{transform:translate(0,0) scale(1)} to{transform:translate(-30px,40px) scale(1.06)} }
+
+  /* ── THEME BADGE ── */
+  #themeBadge {
+    position: fixed; top: 1.2rem; right: 1.2rem; z-index: 800;
+    background: var(--card-bg);
+    border: 1px solid rgba(176,137,104,.25);
+    backdrop-filter: blur(8px);
+    border-radius: 30px; padding: .4rem 1rem;
+    font-size: .68rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--gold); cursor: default;
+    transition: all 2s ease;
+  }
+
+  /* ── PETALS (day) / FIREFLIES (night) ── */
+  .petals { position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden; }
+  .petal {
+    position:absolute; top:-40px;
+    background: radial-gradient(circle at 30% 30%, #f2d0c4, #c98a7d);
+    border-radius: 80% 0 80% 0;
+    opacity: 0;
+    animation: petal-fall linear infinite;
+    transition: opacity 2s ease;
+  }
+  body.night .petal { opacity: 0 !important; animation-play-state: paused; }
+  @keyframes petal-fall {
+    0%  { opacity:0; transform:translateY(-5vh) rotate(0deg); }
+    5%  { opacity:.5; }
+    90% { opacity:.4; }
+    100%{ opacity:0; transform:translateY(110vh) rotate(600deg); }
+  }
+
+  .firefly {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: #c8f0a0;
+    box-shadow: 0 0 6px 2px rgba(180,240,120,.7);
+    opacity: 0;
+    animation: ff-float linear infinite;
+  }
+  @keyframes ff-float {
+    0%   { opacity:0; transform:translate(0,0); }
+    10%  { opacity:.8; }
+    50%  { opacity:.4; transform:translate(var(--fx),var(--fy)); }
+    90%  { opacity:.7; }
+    100% { opacity:0; transform:translate(calc(var(--fx)*2),calc(var(--fy)*2)); }
+  }
+
+  /* ── LOGIN SCREEN ── */
+  #loginScreen {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 2rem;
+    transition: opacity .8s ease, transform .8s ease, background 2s ease;
+  }
+  #loginScreen.hide { opacity: 0; transform: scale(1.04); pointer-events: none; }
+  .login-blobs { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .login-blob  { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .35; }
+  .login-blob-1 { width:600px; height:500px; background:#e8c4a8; top:-150px; left:-200px; animation: drift1 18s ease-in-out infinite alternate; }
+  .login-blob-2 { width:500px; height:500px; background:#dbb89a; bottom:-100px; right:-150px; animation: drift2 22s ease-in-out infinite alternate; }
+  body.night .login-blob-1 { background: rgba(100,60,180,.6); }
+  body.night .login-blob-2 { background: rgba(60,30,140,.55); }
+
+  .login-box { position: relative; z-index: 2; text-align: center; max-width: 420px; width: 100%; }
+  .login-petal { font-size: 2.5rem; margin-bottom: 1.2rem; animation: bob 3s ease-in-out infinite; display: block; }
+  .login-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.4rem, 8vw, 3.8rem);
+    color: var(--mocha-deep); margin-bottom: .5rem; line-height: 1.1;
+  }
+  .login-sub { font-style: italic; font-size: 1.05rem; color: var(--mocha); margin-bottom: 2.5rem; line-height: 1.8; }
+  .login-hint { font-size: .72rem; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; display: block; }
+  .login-inputs { display: flex; gap: .6rem; justify-content: center; margin-bottom: 1.2rem; flex-wrap: wrap; }
+  .login-inputs input {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.1rem; text-align: center;
+    background: rgba(255,255,255,.6);
+    border: 1px solid rgba(176,137,104,.35);
+    border-radius: 4px; color: var(--espresso);
+    padding: .55rem .5rem; outline: none;
+    transition: border-color .3s, box-shadow .3s;
+  }
+  body.night .login-inputs input {
+    background: rgba(255,255,255,.08);
+    border-color: rgba(180,140,240,.3);
+    color: var(--text);
+  }
+  .login-inputs input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(176,137,104,.15); }
+  #loginMonth { width: 70px; }
+  #loginDay   { width: 60px; }
+  #loginYear  { width: 80px; }
+  .login-btn {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1rem; letter-spacing: .18em; text-transform: uppercase;
+    background: linear-gradient(135deg, var(--mocha), var(--mocha-deep));
+    color: var(--cream); border: none; border-radius: 4px;
+    padding: .75rem 2.5rem; cursor: pointer;
+    box-shadow: 0 8px 24px -8px rgba(90,63,45,.4);
+    transition: transform .3s, box-shadow .3s;
+    width: 100%;
+  }
+  body.night .login-btn { background: linear-gradient(135deg, #6030a8, #3a1880); color: #f0ecf8; }
+  .login-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 32px -10px rgba(90,63,45,.45); }
+  .login-btn:active { transform: scale(.97); }
+  .login-error { margin-top: .9rem; font-style: italic; color: var(--rose); font-size: .95rem; opacity: 0; transition: opacity .4s; min-height: 1.4rem; }
+  .login-error.show { opacity: 1; }
+
+  /* ── LAYOUT ── */
+  .section { position:relative; z-index:2; padding:7rem 1.5rem; max-width:860px; margin:0 auto; }
+
+  /* Hero */
+  .hero {
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center; padding:2rem 1.5rem;
+    position:relative; z-index:2;
+  }
+  .hero-eyebrow {
+    letter-spacing:.28em; text-transform:uppercase;
+    font-size:.72rem; font-weight:300; color:var(--gold);
+    margin-bottom:1.6rem; opacity:0; animation:fade-up .9s .3s forwards;
+  }
+  .hero-name {
+    font-family:'Dancing Script',cursive;
+    font-size:clamp(3.6rem,13vw,8.5rem);
+    color:var(--mocha-deep); line-height:1.05; margin-bottom:1.5rem;
+    opacity:0; animation:fade-up .9s .55s forwards;
+    transition: color 2s ease, text-shadow 2s ease;
+  }
+  body.night .hero-name { text-shadow: 0 0 60px rgba(180,140,255,.4), 0 0 120px rgba(140,100,220,.2); }
+  .hero-sub {
+    font-style:italic; font-size:clamp(1.05rem,2vw,1.4rem);
+    color:var(--mocha); max-width:500px; line-height:1.85;
+    opacity:0; animation:fade-up .9s .8s forwards;
+  }
+  .scroll-hint {
+    margin-top:3.5rem; color:var(--gold);
+    font-size:.7rem; letter-spacing:.22em; text-transform:uppercase;
+    display:flex; flex-direction:column; align-items:center; gap:.6rem;
+    animation:bob 2.6s ease-in-out infinite, fade-up .9s 1.1s both;
+  }
+  .scroll-hint::after { content:''; display:block; width:1px; height:48px; background:linear-gradient(to bottom,var(--gold),transparent); }
+  @keyframes fade-up { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:none} }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+  /* ── COUNTDOWN ── */
+  .countdown-wrap { text-align: center; }
+  .countdown-grid { display: flex; justify-content: center; gap: 1.2rem; flex-wrap: wrap; margin: 2.5rem 0 1.5rem; }
+  .cd-unit {
+    display: flex; flex-direction: column; align-items: center;
+    background: var(--card-bg);
+    border: 1px solid rgba(176,137,104,.22);
+    border-radius: 8px; padding: 1.4rem 1.6rem 1rem; min-width: 90px;
+    box-shadow: 0 8px 24px -10px rgba(90,63,45,.2);
+    backdrop-filter: blur(6px);
+    transition: background 2s ease, border-color 2s ease, box-shadow 2s ease;
+  }
+  body.night .cd-unit { border-color: rgba(160,120,240,.25); box-shadow: 0 8px 32px -8px rgba(100,60,200,.3), 0 0 0 1px rgba(160,120,240,.08); }
+  .cd-number {
+    font-family: 'Dancing Script', cursive;
+    font-size: clamp(2.6rem, 6vw, 3.8rem);
+    color: var(--mocha-deep); line-height: 1; margin-bottom: .3rem;
+    transition: transform .2s ease, color 2s ease;
+  }
+  .cd-number.tick { transform: scale(1.12); }
+  .cd-label { font-size: .62rem; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); font-weight: 300; transition: color 2s ease; }
+  .cd-caption { font-style: italic; color: var(--mocha); font-size: 1.05rem; line-height: 1.85; max-width: 500px; margin: 0 auto; transition: color 2s ease; }
+
+  /* Divider */
+  .divider { position:relative; z-index:2; display:flex; align-items:center; gap:1.5rem; max-width:300px; margin:0 auto; padding:0 1.5rem; }
+  .divider::before,.divider::after { content:''; flex:1; height:1px; background:linear-gradient(to right,transparent,var(--divider),transparent); }
+  .divider span { font-size:1.1rem; color:var(--rose); }
+
+  /* Section heads */
+  .head { text-align:center; margin-bottom:3.5rem; }
+  .head .kicker { letter-spacing:.26em; text-transform:uppercase; font-size:.68rem; font-weight:300; color:var(--gold); margin-bottom:.8rem; transition: color 2s ease; }
+  .head h2 { font-family:'Dancing Script',cursive; font-size:clamp(2.4rem,5.5vw,3.8rem); color:var(--mocha-deep); line-height:1.1; transition: color 2s ease; }
+  .head .rule { width:50px; height:1px; background:var(--gold); margin:1.2rem auto 0; transition: background 2s ease; }
+
+  /* Flowers */
+  .flowers-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.1rem; }
+  .flower-btn {
+    aspect-ratio:1/1; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:clamp(2rem,5vw,3rem); border:none; cursor:pointer;
+    background:linear-gradient(145deg,#f5e4d4,#ddbfa2);
+    box-shadow:0 8px 24px -8px rgba(90,63,45,.28), inset 0 -6px 18px rgba(255,255,255,.35);
+    transition:transform .45s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease, background 2s ease;
+    position:relative;
+  }
+  body.night .flower-btn { background: linear-gradient(145deg,#2a1a50,#1a0f38); box-shadow:0 8px 32px -8px rgba(100,60,200,.5), 0 0 20px rgba(160,100,255,.15), inset 0 1px 0 rgba(255,255,255,.08); }
+  .flower-btn::after { content:'tap me'; position:absolute; bottom:-22px; font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); opacity:0; transition:opacity .3s; }
+  .flower-btn:hover { transform:rotate(-8deg) scale(1.1); }
+  .flower-btn:hover::after { opacity:1; }
+  .flower-btn:active { transform:scale(.96); }
+  .flowers-note { text-align:center; margin:2.8rem auto 0; font-style:italic; color:var(--mocha); font-size:1.05rem; line-height:1.85; max-width:600px; transition: color 2s ease; }
+
+  /* Envelopes */
+  .envelopes { display:grid; grid-template-columns:repeat(2,1fr); gap:2.5rem 2rem; }
+  .envelope-wrap { display:flex; flex-direction:column; align-items:center; gap:.75rem; }
+  .envelope { width:100%; max-width:320px; aspect-ratio:1.6/1; position:relative; cursor:pointer; perspective:1000px; user-select:none; }
+  .env-body {
+    position:absolute; inset:0;
+    background:linear-gradient(155deg,#eddcca,#d0b08e);
+    border-radius:3px 3px 5px 5px;
+    border:1px solid rgba(176,137,104,.3);
+    box-shadow:0 12px 32px -10px rgba(90,63,45,.3), inset 0 1px 0 rgba(255,255,255,.35);
+    overflow:hidden; transition: background 2s ease, box-shadow 2s ease;
+  }
+  body.night .env-body { background: linear-gradient(155deg,#1e1040,#120830); border-color: rgba(160,120,240,.25); box-shadow: 0 12px 40px -10px rgba(80,40,180,.5), 0 0 30px rgba(120,80,220,.1); }
+  .env-body::before { content:''; position:absolute; bottom:0; left:0; right:0; height:54%; background:linear-gradient(168deg,#dfc9b0,#c8a07a); clip-path:polygon(0% 100%, 50% 0%, 100% 100%); }
+  body.night .env-body::before { background: linear-gradient(168deg,#2a1858,#180c40); }
+  .env-body::after {
+    content:''; position:absolute; inset:0;
+    background: linear-gradient(135deg, #caa882 50%, transparent 50%), linear-gradient(-135deg, #caa882 50%, transparent 50%);
+    background-size:50% 58%, 50% 58%; background-position:left bottom, right bottom; background-repeat:no-repeat;
+  }
+  body.night .env-body::after { background: linear-gradient(135deg, #1a0e3a 50%, transparent 50%), linear-gradient(-135deg, #1a0e3a 50%, transparent 50%); background-size:50% 58%, 50% 58%; background-position:left bottom, right bottom; background-repeat:no-repeat; }
+  .env-letter { position:absolute; bottom:8%; left:8%; right:8%; height:44%; background:#fdf8f2; border-radius:2px; border:1px solid rgba(176,137,104,.18); z-index:2; display:flex; align-items:center; justify-content:center; transform:translateY(0); transition:transform .55s .15s cubic-bezier(.34,1.2,.64,1), background 2s ease; box-shadow:0 2px 8px rgba(90,63,45,.12); }
+  body.night .env-letter { background: #0e0824; border-color: rgba(160,120,240,.2); }
+  .env-letter span { font-family:'Dancing Script',cursive; font-size:.85rem; color:var(--gold); letter-spacing:.05em; transition: color 2s ease; }
+  .envelope.open .env-letter { transform:translateY(-58%); }
+  .env-seal { position:absolute; bottom:10%; left:50%; transform:translateX(-50%); z-index:4; width:36px; height:36px; background:radial-gradient(circle at 38% 35%, #d4998b, #7a3a30); border-radius:50%; border:2px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font-size:.9rem; color:rgba(255,255,255,.8); box-shadow:0 3px 10px rgba(80,30,20,.35); transition:opacity .4s ease, background 2s ease; }
+  body.night .env-seal { background: radial-gradient(circle at 38% 35%, #9060d0, #4020a0); box-shadow: 0 3px 16px rgba(100,60,220,.5), 0 0 20px rgba(140,100,255,.3); }
+  .envelope.open .env-seal { opacity:0; pointer-events:none; }
+  .env-flap { position:absolute; top:0; left:0; right:0; height:54%; background:linear-gradient(172deg,#e8d2bc,#cba882); clip-path:polygon(0% 0%, 50% 100%, 100% 0%); transform-origin:top center; transform-style:preserve-3d; transition:transform .6s cubic-bezier(.4,0,.2,1), background 2s ease; z-index:5; }
+  body.night .env-flap { background: linear-gradient(172deg,#261450,#160a38); }
+  .envelope.open .env-flap { transform:rotateX(-180deg); }
+  .env-label { letter-spacing:.22em; text-transform:uppercase; font-size:.62rem; font-weight:300; color:var(--gold); transition: color 2s ease; }
+  .env-hint { font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-light); transition:opacity .4s, color 2s ease; }
+  .envelope.open ~ .env-hint { opacity:0; }
+
+  /* Photos */
+  .photo-stack { display:flex; justify-content:center; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-top:1rem; }
+  .photo { background:#fff; padding:12px 12px 44px; box-shadow:0 18px 48px -12px rgba(90,63,45,.38); width:200px; transition:transform .45s cubic-bezier(.34,1.4,.64,1), background 2s ease, box-shadow 2s ease; }
+  body.night .photo { background: #1a1030; box-shadow: 0 18px 60px -12px rgba(80,40,200,.5), 0 0 40px rgba(120,80,220,.15); }
+  .photo:nth-child(1) { transform:rotate(-4.5deg); }
+  .photo:nth-child(2) { transform:rotate(3deg); }
+  .photo:hover { transform:rotate(0deg) scale(1.06) !important; }
+  .photo img { width:100%; aspect-ratio:1/1; object-fit:cover; display:block; }
+  .photo .caption { text-align:center; margin-top:10px; font-family:'Dancing Script',cursive; color:var(--mocha); font-size:1rem; transition: color 2s ease; }
+
+  /* Closing */
+  .closing { text-align:center; padding-bottom:9rem; }
+  .closing .heart { display:inline-block; font-size:2.2rem; color:var(--rose); animation:beat 1.7s ease-in-out infinite; margin-bottom:1.2rem; transition: color 2s ease; }
+  @keyframes beat { 0%,100%{transform:scale(1)} 25%{transform:scale(1.18)} 50%{transform:scale(1.05)} 75%{transform:scale(1.14)} }
+  .closing .always { font-style:italic; font-size:1.2rem; color:var(--gold); letter-spacing:.1em; display:block; margin-bottom:.4rem; transition: color 2s ease; }
+  .closing .sig { font-family:'Dancing Script',cursive; font-size:clamp(2.8rem,7vw,4.2rem); color:var(--mocha-deep); line-height:1.1; transition: color 2s ease; }
+
+  footer { position:relative; z-index:2; text-align:center; padding:2rem 1rem 3rem; color:var(--gold); font-size:.7rem; letter-spacing:.18em; text-transform:uppercase; transition: color 2s ease; }
+
+  /* Reveal */
+  .reveal { opacity:0; transform:translateY(36px); transition:opacity 1.1s ease,transform 1.1s ease; }
+  .reveal.show { opacity:1; transform:none; }
+
+  /* Flower popup */
+  .f-overlay { position:fixed; inset:0; background:rgba(42,26,14,.52); backdrop-filter:blur(6px); z-index:900; display:flex; align-items:center; justify-content:center; padding:1.5rem; opacity:0; pointer-events:none; transition:opacity .4s ease; }
+  body.night .f-overlay { background: rgba(8,4,24,.7); }
+  .f-overlay.open { opacity:1; pointer-events:all; }
+  .f-popup { background:var(--bg); border-radius:8px; padding:3rem 2.2rem 2.5rem; max-width:380px; width:100%; text-align:center; position:relative; transform:translateY(30px) scale(.95); transition:transform .4s cubic-bezier(.34,1.45,.64,1), background 2s ease; box-shadow:0 40px 80px -20px rgba(42,26,14,.45); border:1px solid rgba(176,137,104,.25); }
+  body.night .f-popup { box-shadow: 0 40px 80px -20px rgba(80,40,200,.5), 0 0 60px rgba(120,80,220,.15); border-color: rgba(160,120,240,.2); }
+  .f-overlay.open .f-popup { transform:none; }
+  .f-popup-close { position:absolute; top:14px; right:18px; background:none; border:none; cursor:pointer; font-size:1.6rem; line-height:1; color:var(--gold-light); transition:color .2s,transform .2s; }
+  .f-popup-close:hover { color:var(--mocha-deep); transform:rotate(90deg); }
+  .f-popup-emoji { font-size:4rem; display:block; margin-bottom:1rem; }
+  .f-popup-name { font-family:'Dancing Script',cursive; font-size:2.1rem; color:var(--mocha-deep); margin-bottom:.8rem; line-height:1.1; transition: color 2s ease; }
+  .f-popup-rule { width:36px; height:1px; background:var(--gold); margin:0 auto .9rem; transition: background 2s ease; }
+  .f-popup-msg { font-style:italic; font-size:1.12rem; color:var(--mocha); line-height:1.85; transition: color 2s ease; }
+
+  /* Poem modal */
+  .p-overlay { position:fixed; inset:0; background:rgba(42,26,14,.5); backdrop-filter:blur(7px); z-index:950; display:flex; align-items:center; justify-content:center; padding:1.5rem; opacity:0; pointer-events:none; transition:opacity .4s ease; }
+  body.night .p-overlay { background: rgba(8,4,24,.72); }
+  .p-overlay.open { opacity:1; pointer-events:all; }
+  .p-modal { background:var(--bg); border-radius:6px; padding:3rem 2.4rem 2.8rem; max-width:480px; width:100%; position:relative; text-align:center; transform:translateY(28px) scale(.95); transition:transform .45s cubic-bezier(.34,1.4,.64,1), background 2s ease; box-shadow:0 48px 80px -24px rgba(42,26,14,.45); border:1px solid rgba(176,137,104,.22); }
+  body.night .p-modal { box-shadow: 0 48px 80px -24px rgba(80,40,200,.5); border-color: rgba(160,120,240,.18); }
+  .p-overlay.open .p-modal { transform:none; }
+  .p-modal::before { content:'\201C'; position:absolute; top:4px; left:18px; font-family:'Dancing Script',cursive; font-size:5rem; color:var(--rose); opacity:.25; line-height:1; }
+  .p-modal-close { position:absolute; top:14px; right:18px; background:none; border:none; cursor:pointer; font-size:1.5rem; color:var(--gold-light); transition:color .2s,transform .2s; }
+  .p-modal-close:hover { color:var(--mocha-deep); transform:rotate(90deg); }
+  .p-modal-label { letter-spacing:.24em; text-transform:uppercase; font-size:.65rem; font-weight:300; color:var(--gold); margin-bottom:.8rem; transition: color 2s ease; }
+  .p-modal-rule { width:36px; height:1px; background:var(--gold); margin:.8rem auto 1.4rem; transition: background 2s ease; }
+  .p-modal-text { font-style:italic; font-size:clamp(1.1rem,2vw,1.28rem); line-height:2; color:var(--text); transition: color 2s ease; }
+
+  /* body text transitions */
+  p, span, h1, h2, h3, div { transition: color 2s ease; }
+
+  @media(max-width:540px){
+    .flowers-grid { grid-template-columns:repeat(2,1fr); }
+    .envelopes    { grid-template-columns:1fr; }
+    .photo { width:155px; }
+    .cd-unit { min-width:70px; padding:1rem 1rem .8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NIGHT SKY CANVAS ── -->
+<canvas id="nightSky"></canvas>
+
+<!-- ── AURORA ── -->
+<div class="aurora-wrap" aria-hidden="true">
+  <div class="aurora aurora-1"></div>
+  <div class="aurora aurora-2"></div>
+  <div class="aurora aurora-3"></div>
+</div>
+
+<!-- ── THEME BADGE ── -->
+<div id="themeBadge">☀ daytime</div>
+
+<!-- ── BLOBS ── -->
+<div class="blobs" aria-hidden="true">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+</div>
+<div class="petals" id="petals" aria-hidden="true"></div>
+<div class="petals" id="fireflies" aria-hidden="true"></div>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="loginScreen">
+  <div class="login-blobs">
+    <div class="login-blob login-blob-1"></div>
+    <div class="login-blob login-blob-2"></div>
+  </div>
+  <div class="login-box">
+    <span class="login-petal" id="loginIcon">🌸</span>
+    <h1 class="login-title">For You, Nicole</h1>
+    <p class="login-sub">This website created by me,<br>was made just for you, babu.</p>
+    <span class="login-hint">Enter our special date to open</span>
+    <div class="login-inputs">
+      <input type="text" id="loginMonth" placeholder="MM" maxlength="2" inputmode="numeric" aria-label="Month" />
+      <input type="text" id="loginDay"   placeholder="DD" maxlength="2" inputmode="numeric" aria-label="Day" />
+      <input type="text" id="loginYear"  placeholder="YYYY" maxlength="4" inputmode="numeric" aria-label="Year" />
+    </div>
+    <button class="login-btn" id="loginBtn">Open ♡</button>
+    <p class="login-error" id="loginError">Bakit mo nakalimutan babu :< One more pweaseee</p>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">For my sweetest babu</p>
+  <h1 class="hero-name">Nicole M. Baybayon</h1>
+  <p class="hero-sub">A gift, made with every quiet thought of you<br>and every word I wished I'd said sooner.</p>
+  <div class="scroll-hint">Scroll down, my luna</div>
+</section>
+
+<!-- COUNTDOWN -->
+<div class="divider reveal"><span>✦</span></div>
+<section class="section reveal">
+  <div class="head">
+    <div class="kicker">Since April 17, 2026</div>
+    <h2>Us, in numbers</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="countdown-wrap">
+    <div class="countdown-grid">
+      <div class="cd-unit"><span class="cd-number" id="cd-days">0</span><span class="cd-label">Days</span></div>
+      <div class="cd-unit"><span class="cd-number" id="cd-hours">0</span><span class="cd-label">Hours</span></div>
+      <div class="cd-unit"><span class="cd-number" id="cd-mins">0</span><span class="cd-label">Minutes</span></div>
+      <div class="cd-unit"><span class="cd-number" id="cd-secs">0</span><span class="cd-label">Seconds</span></div>
+    </div>
+    <p class="cd-caption">Every second with you is one I never want to take for granted.</p>
+  </div>
+</section>
+
+<!-- FLOWERS -->
+<div class="divider reveal"><span>✦</span></div>
+<section class="section reveal">
+  <div class="head">
+    <div class="kicker">With a smile so beautiful</div>
+    <h2>Flowers, for you</h2>
+    <div class="rule"></div>
+  </div>
+  <p style="text-align:center;font-style:italic;color:var(--mocha);margin-bottom:2.8rem;font-size:1.05rem;line-height:1.85;">
+    In a field full of flowers, I'd make a bouquet just for you.<br>Click each one — I left you a little message inside.
+  </p>
+  <div class="flowers-grid" id="flowerGrid"></div>
+  <p class="flowers-note">
+    Flowers always remind me of you, babu. They grow silently from seeds,
+    but when they bloom — they show the whole world how beautiful they are
+    when properly loved and taken care of.
+  </p>
+</section>
+
+<!-- POEMS / ENVELOPES -->
+<div class="divider reveal"><span>✦</span></div>
+<section class="section reveal">
+  <div class="head">
+    <div class="kicker">Each stroke of a line</div>
+    <h2>Is a message for you</h2>
+    <div class="rule"></div>
+  </div>
+  <p style="text-align:center;font-style:italic;color:var(--mocha);margin-bottom:2.8rem;font-size:1.05rem;line-height:1.85;">
+    Four letters, sealed just for you. Open each one when you're ready.
+  </p>
+  <div class="envelopes">
+    <div class="envelope-wrap">
+      <div class="envelope" id="env-0" role="button" tabindex="0" aria-label="Open envelope 1">
+        <div class="env-body"></div><div class="env-letter"><span>for you ♡</span></div>
+        <div class="env-seal">✦</div><div class="env-flap"></div>
+      </div>
+      <span class="env-label">For You, Babu</span>
+      <span class="env-hint" id="hint-0">click to open</span>
+    </div>
+    <div class="envelope-wrap">
+      <div class="envelope" id="env-1" role="button" tabindex="0" aria-label="Open envelope 2">
+        <div class="env-body"></div><div class="env-letter"><span>for you ♡</span></div>
+        <div class="env-seal">✦</div><div class="env-flap"></div>
+      </div>
+      <span class="env-label">For You, Babu</span>
+      <span class="env-hint" id="hint-1">click to open</span>
+    </div>
+    <div class="envelope-wrap">
+      <div class="envelope" id="env-2" role="button" tabindex="0" aria-label="Open envelope 3">
+        <div class="env-body"></div><div class="env-letter"><span>for you ♡</span></div>
+        <div class="env-seal">✦</div><div class="env-flap"></div>
+      </div>
+      <span class="env-label">For You, Babu</span>
+      <span class="env-hint" id="hint-2">click to open</span>
+    </div>
+    <div class="envelope-wrap">
+      <div class="envelope" id="env-3" role="button" tabindex="0" aria-label="Open envelope 4">
+        <div class="env-body"></div><div class="env-letter"><span>for you ♡</span></div>
+        <div class="env-seal">✦</div><div class="env-flap"></div>
+      </div>
+      <span class="env-label">For You, Babu</span>
+      <span class="env-hint" id="hint-3">click to open</span>
+    </div>
+  </div>
+</section>
+
+<!-- PHOTOS -->
+<div class="divider reveal"><span>✦</span></div>
+<section class="section reveal" style="padding-bottom:4rem;">
+  <div class="head">
+    <div class="kicker">Frozen in time</div>
+    <h2>A few of my favorites</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="photo-stack">
+    <div class="photo">
+      <img src="images/Messenger_creation_627E0D0A-6C8D-45B3-9530-ACD5EE371D50.jpeg" alt="My Love" />
+      <div class="caption">My Love</div>
+    </div>
+    <div class="photo">
+      <img src="images/a6e98aa1-ac5c-4929-99de-6f3f82484137.jpg" alt="I Love You" />
+      <div class="caption">I love you</div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<div class="divider reveal"><span>✦</span></div>
+<section class="section closing reveal">
+  <div class="heart">♥</div>
+  <span class="always">always, forever, genuinely —</span>
+  <div class="sig">Topi</div>
+</section>
+
+<footer>made for you, just for you, babu ♡</footer>
+
+<!-- FLOWER POPUP -->
+<div class="f-overlay" id="fOverlay" role="dialog" aria-modal="true">
+  <div class="f-popup">
+    <button class="f-popup-close" id="fClose" aria-label="Close">×</button>
+    <span class="f-popup-emoji" id="fEmoji"></span>
+    <h3 class="f-popup-name" id="fName"></h3>
+    <div class="f-popup-rule"></div>
+    <p class="f-popup-msg" id="fMsg"></p>
+  </div>
+</div>
+
+<!-- POEM MODAL -->
+<div class="p-overlay" id="pOverlay" role="dialog" aria-modal="true">
+  <div class="p-modal">
+    <button class="p-modal-close" id="pClose" aria-label="Close letter">×</button>
+    <div class="p-modal-label" id="pLabel"></div>
+    <div class="p-modal-rule"></div>
+    <p class="p-modal-text" id="pText"></p>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════
+   DAY / NIGHT SYSTEM
+════════════════════════════════ */
+const badge = document.getElementById('themeBadge');
+const loginIcon = document.getElementById('loginIcon');
+
+function getTimeOfDay() {
+  const h = new Date().getHours();
+  if (h >= 6 && h < 18) return 'day';
+  return 'night';
+}
+
+/* ════════════════════════════════
+   NIGHT SKY CANVAS
+   Stars + shooting stars + moon
+════════════════════════════════ */
+const canvas = document.getElementById('nightSky');
+const ctx = canvas.getContext('2d');
+let stars = [], shooters = [], nightFrame, isNight = false, shooterInterval;
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function applyTheme(mode) {
+  if (mode === 'night') {
+    document.body.classList.add('night');
+    badge.textContent = '☾ nighttime';
+    loginIcon.textContent = '🌙';
+    startNightSky();
+  } else {
+    document.body.classList.remove('night');
+    badge.textContent = '☀ daytime';
+    loginIcon.textContent = '🌸';
+    stopNightSky();
+  }
+}
+
+applyTheme(getTimeOfDay());
+// re-check every minute in case she leaves the tab open across sunset/sunrise
+setInterval(() => applyTheme(getTimeOfDay()), 60000);
+
+function makeStars(n) {
+  stars = [];
+  for (let i = 0; i < n; i++) {
+    stars.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.4 + 0.2,
+      alpha: Math.random(),
+      speed: Math.random() * 0.006 + 0.002,
+      phase: Math.random() * Math.PI * 2,
+      color: Math.random() < 0.15
+        ? `hsl(${200 + Math.random()*60},80%,85%)`
+        : Math.random() < 0.1
+          ? `hsl(${20 + Math.random()*30},60%,90%)`
+          : '#ffffff'
+    });
+  }
+}
+
+function spawnShooter() {
+  shooters.push({
+    x: Math.random() * canvas.width * 0.7,
+    y: Math.random() * canvas.height * 0.4,
+    len: 120 + Math.random() * 80,
+    speed: 10 + Math.random() * 8,
+    alpha: 1,
+    angle: Math.PI / 5 + Math.random() * 0.2,
+    progress: 0
+  });
+}
+
+function drawMoon() {
+  const mx = canvas.width * 0.82, my = canvas.height * 0.12;
+  const r = 38;
+  // glow
+  const grd = ctx.createRadialGradient(mx, my, r * 0.5, mx, my, r * 3.5);
+  grd.addColorStop(0, 'rgba(220,210,255,0.18)');
+  grd.addColorStop(0.4, 'rgba(180,160,240,0.07)');
+  grd.addColorStop(1, 'transparent');
+  ctx.beginPath(); ctx.arc(mx, my, r * 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = grd; ctx.fill();
+  // moon body
+  const mg = ctx.createRadialGradient(mx - r*0.3, my - r*0.3, r*0.1, mx, my, r);
+  mg.addColorStop(0, '#f8f4ff');
+  mg.addColorStop(0.5, '#e8e0f8');
+  mg.addColorStop(1, '#c8b8e8');
+  ctx.beginPath(); ctx.arc(mx, my, r, 0, Math.PI * 2);
+  ctx.fillStyle = mg; ctx.fill();
+  // crescent shadow
+  ctx.beginPath(); ctx.arc(mx + r * 0.35, my - r * 0.1, r * 0.88, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(7,9,26,0.82)'; ctx.fill();
+  // craters
+  [[mx - 12, my + 8, 4], [mx - 4, my - 14, 3], [mx - 20, my - 2, 2.5]].forEach(([cx,cy,cr]) => {
+    ctx.beginPath(); ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(180,160,220,0.25)'; ctx.fill();
+  });
+}
+
+function nightLoop(t) {
+  if (!isNight) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const time = t * 0.001;
+
+  // stars
+  stars.forEach(s => {
+    const a = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(time * s.speed * 6 + s.phase));
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = s.color;
+    ctx.globalAlpha = a;
+    ctx.fill();
+    // tiny cross sparkle for bigger stars
+    if (s.r > 1.1) {
+      ctx.globalAlpha = a * 0.4;
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(s.x - s.r * 2.5, s.y); ctx.lineTo(s.x + s.r * 2.5, s.y);
+      ctx.moveTo(s.x, s.y - s.r * 2.5); ctx.lineTo(s.x, s.y + s.r * 2.5);
+      ctx.stroke();
+    }
+  });
+  ctx.globalAlpha = 1;
+
+  // shooting stars
+  shooters = shooters.filter(s => s.alpha > 0.01);
+  shooters.forEach(s => {
+    s.progress += s.speed;
+    s.alpha -= 0.018;
+    const ex = s.x + Math.cos(s.angle) * s.progress;
+    const ey = s.y + Math.sin(s.angle) * s.progress;
+    const sx = ex - Math.cos(s.angle) * s.len;
+    const sy = ey - Math.sin(s.angle) * s.len;
+    const grad = ctx.createLinearGradient(sx, sy, ex, ey);
+    grad.addColorStop(0, 'transparent');
+    grad.addColorStop(0.7, `rgba(220,210,255,${s.alpha * 0.5})`);
+    grad.addColorStop(1, `rgba(255,255,255,${s.alpha})`);
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
+    ctx.strokeStyle = grad; ctx.lineWidth = 1.5; ctx.stroke();
+  });
+
+  drawMoon();
+  nightFrame = requestAnimationFrame(nightLoop);
+}
+
+function startNightSky() {
+  if (isNight) return;
+  isNight = true;
+  resizeCanvas();
+  makeStars(280);
+  nightFrame = requestAnimationFrame(nightLoop);
+  shooterInterval = setInterval(() => {
+    if (Math.random() < 0.5) spawnShooter();
+  }, 4000);
+  // fireflies
+  buildFireflies();
+}
+function stopNightSky() {
+  isNight = false;
+  cancelAnimationFrame(nightFrame);
+  clearInterval(shooterInterval);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('fireflies').innerHTML = '';
+}
+
+function buildFireflies() {
+  const container = document.getElementById('fireflies');
+  container.innerHTML = '';
+  for (let i = 0; i < 18; i++) {
+    const f = document.createElement('div');
+    f.className = 'firefly';
+    f.style.left = (Math.random() * 100) + 'vw';
+    f.style.top  = (40 + Math.random() * 55) + 'vh';
+    const fx = (Math.random() * 80 - 40) + 'px';
+    const fy = (Math.random() * 80 - 40) + 'px';
+    f.style.setProperty('--fx', fx);
+    f.style.setProperty('--fy', fy);
+    f.style.animationDuration = (8 + Math.random() * 12) + 's';
+    f.style.animationDelay    = (Math.random() * -20) + 's';
+    container.appendChild(f);
+  }
+}
+
+/* ════════════════════════════════
+   LOGIN
+════════════════════════════════ */
+const loginScreen = document.getElementById('loginScreen');
+const loginBtn    = document.getElementById('loginBtn');
+const loginError  = document.getElementById('loginError');
+const mEl = document.getElementById('loginMonth');
+const dEl = document.getElementById('loginDay');
+const yEl = document.getElementById('loginYear');
+
+function autoTab(el, next) {
+  el.addEventListener('input', () => { if (el.value.length >= el.maxLength && next) next.focus(); });
+}
+autoTab(mEl, dEl); autoTab(dEl, yEl);
+
+function tryLogin() {
+  const m = parseInt(mEl.value, 10);
+  const d = parseInt(dEl.value, 10);
+  const y = parseInt(yEl.value, 10);
+  if (m === 4 && d === 17 && y === 2026) {
+    loginScreen.classList.add('hide');
+    loginError.classList.remove('show');
+    setTimeout(() => { loginScreen.style.display = 'none'; }, 900);
+  } else {
+    loginError.classList.add('show');
+    mEl.value = ''; dEl.value = ''; yEl.value = '';
+    mEl.focus();
+    setTimeout(() => loginError.classList.remove('show'), 3200);
+  }
+}
+loginBtn.addEventListener('click', tryLogin);
+[mEl, dEl, yEl].forEach(el => { el.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); }); });
+
+/* ════════════════════════════════
+   COUNTDOWN
+════════════════════════════════ */
+const startDate = new Date('2026-04-17T23:18:00');
+function updateCountdown() {
+  const diff = Math.max(0, new Date() - startDate);
+  const totalSecs = Math.floor(diff / 1000);
+  const secs  = totalSecs % 60;
+  const mins  = Math.floor(totalSecs / 60) % 60;
+  const hours = Math.floor(totalSecs / 3600) % 24;
+  const days  = Math.floor(totalSecs / 86400);
+  function set(id, val) {
+    const el = document.getElementById(id);
+    const next = String(val).padStart(2, '0');
+    if (el.textContent !== next) {
+      el.textContent = next;
+      el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick');
+      setTimeout(() => el.classList.remove('tick'), 200);
+    }
+  }
+  set('cd-days', days); set('cd-hours', hours); set('cd-mins', mins); set('cd-secs', secs);
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+/* ════════════════════════════════
+   FLOWERS
+════════════════════════════════ */
+const flowers = [
+  { emoji:"🌹", name:"Red Rose",       msg:"Red roses are the ultimate universal symbol of romantic love, passion, and deep devotion" },
+  { emoji:"🌷", name:"Tulip",          msg:"In the language of flowers, tulips generally symbolize deep, perfect, and unconditional love" },
+  { emoji:"🌸", name:"Cherry Blossom", msg:"Cherry blossoms symbolize love, passion, and feminine beauty." },
+  { emoji:"🌺", name:"Hibiscus",       msg:"In the language of flowers, the hibiscus generally represents delicate beauty, hospitality, and deep affection." },
+  { emoji:"🪷", name:"Lotus",          msg:"The lotus flower in love symbolizes resilience, pure devotion, and a bond that thrives amidst adversity." },
+  { emoji:"💐", name:"A Bouquet",      msg:"In the language of love, a bouquet symbolizes the sender's unsaid emotions, representing passion, care, and devotion." },
+  { emoji:"🪻", name:"Hyacinth",       msg:"In love, hyacinths generally symbolize sincerity, deep emotional attachment, and constancy. " },
+  { emoji:"🌼", name:"Sunflower",      msg:"In love, sunflowers symbolize unwavering loyalty, deep adoration, and steadfast devotion. " },
+];
+const poems = [
+  { label:"Dear Babu,", text:"You still shine even when the sky turns cloudy. You always bloom even when the rain starts to pour. And you always keep people warm when the weather turns cold." },
+  { label:"Dear Babu,", text:"You're like a fire that keeps on burning. The sun that keeps on glowing. A cup of coffee giving warmth to keep on going. All these things give off the same certainty and love that you give — even without me asking." },
+  { label:"Dear Babu,", text:"You're always going to be the language I'll keep on learning. A math equation I'll keep on solving. A program I'll keep on coding. And the only person I'll keep on loving." },
+  { label:"Dear Babu,", text:"A pen for both you and I — co-authoring each other's life till π. For every page I've turned, you are the one I really yearned." },
+];
+
+const grid = document.getElementById('flowerGrid');
+flowers.forEach((f, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'flower-btn';
+  btn.setAttribute('aria-label', 'Open message for ' + f.name);
+  btn.innerHTML = '<span aria-hidden="true">' + f.emoji + '</span>';
+  btn.addEventListener('click', () => openFlower(i));
+  grid.appendChild(btn);
+});
+
+const fOverlay = document.getElementById('fOverlay');
+const fClose   = document.getElementById('fClose');
+function openFlower(i) {
+  document.getElementById('fEmoji').textContent = flowers[i].emoji;
+  document.getElementById('fName').textContent  = flowers[i].name;
+  document.getElementById('fMsg').textContent   = flowers[i].msg;
+  fOverlay.classList.add('open'); fClose.focus();
+}
+function closeFlower() { fOverlay.classList.remove('open'); }
+fClose.addEventListener('click', closeFlower);
+fOverlay.addEventListener('click', e => { if (e.target === fOverlay) closeFlower(); });
+
+/* ════════════════════════════════
+   ENVELOPES
+════════════════════════════════ */
+const pOverlay = document.getElementById('pOverlay');
+const pClose   = document.getElementById('pClose');
+for (let i = 0; i < 4; i++) {
+  const env = document.getElementById('env-' + i);
+  const hint = document.getElementById('hint-' + i);
+  function makeHandler(idx, el, hintEl) {
+    return function() {
+      if (!el.classList.contains('open')) {
+        el.classList.add('open'); hintEl.style.opacity = '0';
+        setTimeout(() => showPoem(idx), 680);
+      } else { showPoem(idx); }
+    };
+  }
+  const h = makeHandler(i, env, hint);
+  env.addEventListener('click', h);
+  env.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); h(); } });
+}
+function showPoem(i) {
+  document.getElementById('pLabel').textContent = poems[i].label;
+  document.getElementById('pText').textContent  = poems[i].text;
+  pOverlay.classList.add('open'); pClose.focus();
+}
+function closePoem() { pOverlay.classList.remove('open'); }
+pClose.addEventListener('click', closePoem);
+pOverlay.addEventListener('click', e => { if (e.target === pOverlay) closePoem(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeFlower(); closePoem(); } });
+
+/* ════════════════════════════════
+   PETALS
+════════════════════════════════ */
+const petalContainer = document.getElementById('petals');
+for (let i = 0; i < 22; i++) {
+  const p = document.createElement('div');
+  p.className = 'petal';
+  p.style.left = (Math.random() * 100) + 'vw';
+  const size = 7 + Math.random() * 13;
+  p.style.width = size + 'px'; p.style.height = size + 'px';
+  p.style.animationDuration = (12 + Math.random() * 16) + 's';
+  p.style.animationDelay    = (Math.random() * -28) + 's';
+  petalContainer.appendChild(p);
+}
+
+/* ════════════════════════════════
+   SCROLL REVEAL
+════════════════════════════════ */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); } });
+}, { threshold: .12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
