@@ -188,7 +188,7 @@
   }
 
   function openWishModal(wish){
-    if(!modal || !modalContent) return;
+    if(!modal || !modalContent || !modalOverlay) return;
     
     modalContent.innerHTML=`
       <div class="modal-wish-header">
@@ -200,12 +200,12 @@
       </div>
     `;
     
-    modal.classList.add('active');
+    modalOverlay.classList.add('active');
   }
 
   function closeWishModal(){
-    if(!modal) return;
-    modal.classList.remove('active');
+    if(!modalOverlay) return;
+    modalOverlay.classList.remove('active');
   }
 
   function renderHiddenList(ws){
@@ -325,16 +325,17 @@
       if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addWish();}
     });
 
-    // Modal event listeners
+    // Modal event listeners - fixed to prevent stopping clicks on inputs
     if(modalClose){
       modalClose.addEventListener('click',closeWishModal);
     }
+    
+    // Close modal only when clicking on the overlay background, not the modal itself
     if(modalOverlay){
-      modalOverlay.addEventListener('click',closeWishModal);
-    }
-    if(modal){
-      modal.addEventListener('click',(e)=>{
-        if(e.target===modal) closeWishModal();
+      modalOverlay.addEventListener('click',(e)=>{
+        if(e.target === modalOverlay) {
+          closeWishModal();
+        }
       });
     }
 
