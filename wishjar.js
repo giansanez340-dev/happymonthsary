@@ -1,10 +1,9 @@
 /* ════════════════════════════════
-   WISH JAR — Google Sheets backend
-   Replace WISH_SCRIPT_URL with your
-   Google Apps Script web app URL
+   WISH JAR — Local Storage Backend
+   Wishes are stored in browser's localStorage
 ════════════════════════════════ */
 (function() {
-  const WISH_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby41BOjYrtZQgeKk-Aka2GddnJuleHWKtw77MXRzQuUI76-no629Tnj7Xg-tvz6_od78g/exec';
+  const STORAGE_KEY = 'wishes_jar_data';
 
   const canvas   = document.getElementById('wishCanvas');
   const ctx      = canvas.getContext('2d');
@@ -173,94 +172,100 @@
       listWrap.appendChild(d);
     });
   }
+
   function renderHiddenList(ws){
-  if(!hiddenList) return;
+    if(!hiddenList) return;
 
-  hiddenList.innerHTML='';
+    hiddenList.innerHTML='';
 
-  if(!ws.length){
-    hiddenList.innerHTML = `
-      <div class="hidden-wish-item">
-        No wishes yet ✦
-      </div>
-    `;
-    return;
+    if(!ws.length){
+      hiddenList.innerHTML = `
+        <div class="hidden-wish-item">
+          No wishes yet ✦
+        </div>
+      `;
+      return;
+    }
+
+    [...ws].reverse().forEach(w=>{
+      const item=document.createElement('div');
+
+      item.className='hidden-wish-item';
+
+      item.innerHTML=`
+        🔒 ${w.name || 'Someone'}'s Wish
+      `;
+
+      hiddenList.appendChild(item);
+    });
   }
 
-  [...ws].reverse().forEach(w=>{
-    const item=document.createElement('div');
-
-    item.className='hidden-wish-item';
-
-    item.innerHTML=`
-      🔒 ${w.name || 'Someone'}'s Wish
-    `;
-
-    hiddenList.appendChild(item);
-  });
-}
-
-  async function fetchWishes(){
+  // Local Storage Functions
+  function loadWishes(){
     try{
-      const r=await fetch(WISH_SCRIPT_URL);
-      return await r.json();
-    }catch{ return null; }
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : [];
+    }catch{
+      return [];
+    }
   }
 
-async function postWish(name,text,ts){
-  await fetch(WISH_SCRIPT_URL,{
-    method:'POST',
-    body:JSON.stringify({
-      name,
-      text,
-      ts
-    }),
-  });
-}
-
- async function addWish(){
-  const name = nameInput.value.trim();
-  const text = textarea.value.trim();
-
-  if(!name || !text){
-    status.textContent='Please enter your name and a wish.';
-    return;
+  function saveWishes(ws){
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(ws));
+    }catch(err){
+      console.error('Failed to save wishes:', err);
+    }
   }
 
-  addBtn.disabled=true;
-  status.textContent='Saving…';
+  async function addWish(){
+    const name = nameInput.value.trim();
+    const text = textarea.value.trim();
 
-  try{
-    const ts=new Date().toISOString();
+    if(!name || !text){
+      status.textContent='Please enter your name and a wish.';
+      return;
+    }
 
-    await postWish(name,text,ts);
+    addBtn.disabled=true;
+    status.textContent='Saving…';
 
-    wishes=await fetchWishes() || wishes;
+    try{
+      const ts=new Date().toISOString();
 
-    renderList(wishes);
-    renderHiddenList(wishes);
+      // Load existing wishes
+      wishes = loadWishes();
 
-    updateFillUI(wishes.length);
-    buildStars(wishes.length,false);
-    loopFall();
+      // Add new wish
+      wishes.push({ name, text, ts });
 
-    nameInput.value='';
-    textarea.value='';
+      // Save to localStorage
+      saveWishes(wishes);
 
-    status.textContent='Wish saved ✦';
+      renderList(wishes);
+      renderHiddenList(wishes);
 
-    setTimeout(()=>{
-      status.textContent='';
-    },2500);
+      updateFillUI(wishes.length);
+      buildStars(wishes.length,false);
+      loopFall();
 
-  }catch(err){
-    console.error(err);
-    status.textContent='Could not save — check your script URL.';
+      nameInput.value='';
+      textarea.value='';
+
+      status.textContent='Wish saved ✦';
+
+      setTimeout(()=>{
+        status.textContent='';
+      },2500);
+
+    }catch(err){
+      console.error(err);
+      status.textContent='Could not save wish. Please try again.';
+    }
+
+    addBtn.disabled=false;
+    textarea.focus();
   }
-
-  addBtn.disabled=false;
-  textarea.focus();
-}
 
   addBtn.addEventListener('click',addWish);
   textarea.addEventListener('keydown',e=>{
@@ -268,34 +273,18 @@ async function postWish(name,text,ts){
   });
 
   (async()=>{
-  drawJar();
+    drawJar();
 
-  const ws=await fetchWishes();
+    wishes = loadWishes();
 
-  if(ws){
-    wishes=ws;
-
-    renderList(wishes);
-    renderHiddenList(wishes);
-
-    updateFillUI(wishes.length);
-    buildStars(wishes.length,true);
-  }
-
-  setInterval(async()=>{
-    const ws=await fetchWishes();
-
-    if(ws){
-      wishes=ws;
-
+    if(wishes && wishes.length > 0){
       renderList(wishes);
       renderHiddenList(wishes);
 
       updateFillUI(wishes.length);
-      buildStars(wishes.length,false);
+      buildStars(wishes.length,true);
+    } else {
+      updateFillUI(0);
     }
-  },15000);
-
-})();   // closes async IIFE
-
-})();   // closes outer function
+  })();
+})();
