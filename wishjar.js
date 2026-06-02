@@ -1,9 +1,8 @@
 /* ════════════════════════════════
-   WISH JAR — Local Storage Backend + Google Sheets
-   Wishes are stored in browser's localStorage AND synced to Google Sheets
+   WISH JAR — Google Sheets Backend
+   Wishes are stored only in Google Sheets (no localStorage)
 ════════════════════════════════ */
 (function() {
-  const STORAGE_KEY = 'wishes_jar_data';
   const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzUHDgxAL_kN12wAfmmZKvp7gwi1dtL-w8SxPAab0pwLBBLIuVwsL2dMpYzVrHor-PTIQ/exec';
 
   let canvas, ctx, fillBar, fillLbl, listWrap, textarea, addBtn, status, nameInput, hiddenList;
@@ -207,24 +206,6 @@
     });
   }
 
-  // Local Storage Functions
-  function loadWishes(){
-    try{
-      const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
-    }catch{
-      return [];
-    }
-  }
-
-  function saveWishes(ws){
-    try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(ws));
-    }catch(err){
-      console.error('Failed to save wishes to localStorage:', err);
-    }
-  }
-
   // Google Sheets Integration
   async function syncWishToSheet(wish){
     try{
@@ -267,14 +248,8 @@
       const ts=new Date().toISOString();
       const newWish = { name, text, ts };
 
-      // Load existing wishes
-      wishes = loadWishes();
-
-      // Add new wish
+      // Add new wish to in-memory array
       wishes.push(newWish);
-
-      // Save to localStorage
-      saveWishes(wishes);
 
       // Sync to Google Sheets
       syncWishToSheet(newWish);
@@ -318,17 +293,9 @@
 
     drawJar();
 
-    wishes = loadWishes();
-
-    if(wishes && wishes.length > 0){
-      renderList(wishes);
-      renderHiddenList(wishes);
-
-      updateFillUI(wishes.length);
-      buildStars(wishes.length,true);
-    } else {
-      updateFillUI(0);
-    }
+    // Start with empty wishes array (no localStorage)
+    wishes = [];
+    updateFillUI(0);
   }
 
   // Wait for DOM to be ready
