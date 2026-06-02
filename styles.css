@@ -490,9 +490,11 @@ body.night #vinylDisc::before {
 
   /*Wish Jar*/
 #wishJarSection {
-  position: relative; z-index: 2;
+  position: relative;
+  z-index: 2;
   padding: 5rem 1.5rem 6rem;
-  max-width: 520px; margin: 0 auto;
+  max-width: 1100px;
+  margin: 0 auto;
   text-align: center;
 }
 #wishJarSection .head { margin-bottom: 1.8rem; }
@@ -598,4 +600,77 @@ body.night .wish-add-btn { background: linear-gradient(135deg, #6030a8, #3a1880)
   text-transform: uppercase; color: var(--gold);
   margin-top: .7rem; min-height: 1rem;
   font-style: italic; transition: color 2s ease;
+}
+.wish-layout {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.wish-right {
+  width: 320px;
+  text-align: left;
+
+  background: var(--card-bg);
+  border: 1px solid rgba(176,137,104,.2);
+  border-radius: 10px;
+
+  padding: 1rem;
+  min-height: 260px;
+}
+
+body.night .wish-right {
+  border-color: rgba(160,120,240,.2);
+}
+
+.wish-right h3 {
+  margin: 0 0 1rem;
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+#wishHiddenList {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.hidden-wish-item {
+  padding: .7rem .9rem;
+  border-radius: 6px;
+
+  background: rgba(255,255,255,.45);
+  border: 1px solid rgba(176,137,104,.15);
+
+  font-size: .95rem;
+  color: var(--text);
+}
+
+body.night .hidden-wish-item {
+  background: rgba(255,255,255,.04);
+  border-color: rgba(160,120,240,.15);
+}
+
+.wish-name-input {
+  width: 100%;
+  margin-bottom: .6rem;
+
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+
+  background: rgba(255,255,255,.6);
+  border: 1px solid rgba(176,137,104,.35);
+  border-radius: 5px;
+
+  padding: .6rem .85rem;
+  color: var(--espresso);
+  outline: none;
+}
+
+body.night .wish-name-input {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(160,120,240,.3);
+  color: var(--text);
 }
