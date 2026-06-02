@@ -497,6 +497,119 @@ body.night #vinylDisc::before {
   width: 62px; height: 62px;
 }
 #vinylBtn:hover #vinylPauseIcon { color: rgba(255,255,255,.55); }
+
+  /*Wish Jar*/
+#wishJarSection {
+  position: relative; z-index: 2;
+  padding: 5rem 1.5rem 6rem;
+  max-width: 520px; margin: 0 auto;
+  text-align: center;
+}
+#wishJarSection .head { margin-bottom: 1.8rem; }
+.jar-canvas-wrap {
+  position: relative; width: 200px; margin: 0 auto 1rem;
+}
+#wishCanvas { display: block; width: 200px; height: 260px; }
+.jar-fill-wrap {
+  width: 160px; margin: .4rem auto .2rem;
+  height: 6px;
+  background: rgba(176,137,104,.18);
+  border-radius: 3px; overflow: hidden;
+}
+.jar-fill-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, #c98a7d, #b08968);
+  border-radius: 3px;
+  transition: width .7s cubic-bezier(.4,0,.2,1);
+}
+body.night .jar-fill-bar { background: linear-gradient(90deg, #c8a8e8, #9060c0); }
+.jar-fill-label {
+  font-size: .68rem; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 1.4rem; display: block;
+  transition: color 2s ease;
+}
+.wish-list-wrap {
+  display: flex; flex-direction: column; gap: .5rem;
+  max-height: 220px; overflow-y: auto;
+  margin-bottom: 1.2rem;
+  scrollbar-width: thin; scrollbar-color: #d4aa88 transparent;
+  text-align: left;
+}
+.wish-list-wrap:empty::after {
+  content: 'No wishes yet — add the first one \2736';
+  display: block; text-align: center;
+  font-style: italic; color: var(--mocha);
+  font-size: .95rem; padding: 1rem 0;
+}
+.wish-item-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(176,137,104,.2);
+  border-radius: 6px; padding: .55rem .85rem;
+  display: flex; gap: .5rem; align-items: flex-start;
+  animation: wish-card-in .45s cubic-bezier(.34,1.5,.64,1) both;
+}
+body.night .wish-item-card { border-color: rgba(160,120,240,.2); }
+@keyframes wish-card-in {
+  from { opacity:0; transform:translateY(8px) scale(.97); }
+  to   { opacity:1; transform:none; }
+}
+.wish-dot-mark {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #c98a7d; flex-shrink: 0; margin-top: 6px;
+  transition: background 2s ease;
+}
+body.night .wish-dot-mark { background: #c8a8e8; }
+.wish-text-body {
+  flex: 1; font-style: italic; font-size: 1rem;
+  color: var(--text); line-height: 1.5;
+}
+.wish-date-stamp {
+  font-size: .68rem; color: var(--gold);
+  font-style: normal; white-space: nowrap; margin-top: 2px;
+}
+.wish-input-row { display: flex; gap: .6rem; align-items: stretch; }
+.wish-textarea {
+  flex: 1;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1rem;
+  background: rgba(255,255,255,.6);
+  border: 1px solid rgba(176,137,104,.35);
+  border-radius: 5px; padding: .6rem .85rem;
+  color: var(--espresso); outline: none;
+  resize: none; line-height: 1.4;
+  transition: border-color .3s, box-shadow .3s, background 2s ease, color 2s ease;
+}
+body.night .wish-textarea {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(160,120,240,.3); color: var(--text);
+}
+.wish-textarea::placeholder { color: var(--gold); }
+.wish-textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(176,137,104,.12);
+}
+body.night .wish-textarea:focus { box-shadow: 0 0 0 3px rgba(160,120,240,.15); }
+.wish-add-btn {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .88rem; letter-spacing: .14em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--mocha), var(--mocha-deep));
+  color: var(--cream); border: none; border-radius: 5px;
+  padding: 0 1.3rem; cursor: pointer;
+  transition: transform .25s, box-shadow .25s;
+  white-space: nowrap; flex-shrink: 0;
+}
+body.night .wish-add-btn { background: linear-gradient(135deg, #6030a8, #3a1880); }
+.wish-add-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -6px rgba(90,63,45,.4); }
+.wish-add-btn:active { transform: scale(.97); }
+.wish-status {
+  font-size: .72rem; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--gold);
+  margin-top: .7rem; min-height: 1rem;
+  font-style: italic; transition: color 2s ease;
+}
+  
 </style>
 </head>
 <body>
@@ -704,6 +817,32 @@ body.night #vinylDisc::before {
   style="position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;"
   title="background music">
 </iframe>
+
+  <div class="divider reveal"><span>✦</span></div>
+<section id="wishJarSection" class="reveal">
+  <div class="head">
+    <div class="kicker">A jar for both of us</div>
+    <h2>Our Wish Jar</h2>
+    <div class="rule"></div>
+  </div>
+  <p style="font-style:italic;color:var(--mocha);margin-bottom:1.8rem;font-size:1.05rem;line-height:1.85;">
+    Every wish we fold together, kept safe here forever.
+  </p>
+
+  <div class="jar-canvas-wrap">
+    <canvas id="wishCanvas" width="200" height="260" aria-label="Wish jar filling with paper stars"></canvas>
+  </div>
+  <div class="jar-fill-wrap"><div class="jar-fill-bar" id="jarFillBar"></div></div>
+  <span class="jar-fill-label" id="jarFillLabel">empty — add a wish!</span>
+
+  <div class="wish-list-wrap" id="wishListWrap"></div>
+
+  <div class="wish-input-row">
+    <textarea class="wish-textarea" id="wishTextarea" rows="2" placeholder="Write a wish for us both…" maxlength="120"></textarea>
+    <button class="wish-add-btn" id="wishAddBtn">Add ✦</button>
+  </div>
+  <p class="wish-status" id="wishStatus"></p>
+</section>
   
 <script>
 /* ════════════════════════════════
@@ -1089,6 +1228,246 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     playing = !playing;
   });
 })();
+
+<script id="wishjar-script">
+/* ════════════════════════════════
+   WISH JAR — Google Sheets backend
+   Replace WISH_SCRIPT_URL with your
+   Google Apps Script web app URL
+════════════════════════════════ */
+(function() {
+  const WISH_SCRIPT_URL = 'YOUR_SCRIPT_URL';
+
+  const canvas   = document.getElementById('wishCanvas');
+  const ctx      = canvas.getContext('2d');
+  const fillBar  = document.getElementById('jarFillBar');
+  const fillLbl  = document.getElementById('jarFillLabel');
+  const listWrap = document.getElementById('wishListWrap');
+  const textarea = document.getElementById('wishTextarea');
+  const addBtn   = document.getElementById('wishAddBtn');
+  const status   = document.getElementById('wishStatus');
+
+  const W=200, H=260;
+  const JX=30, JY=40, JW=140, JH=195, JR=22;
+  const LX=38, LY=22, LW=124, LH=22, LR=6;
+  const FILL_BOT=JY+JH-12, FILL_TOP=JY+10;
+  const FILL_H=FILL_BOT-FILL_TOP;
+  const MAX_STARS=40;
+  const COLORS=['#e8b4a0','#d4907a','#c98a7d','#e8c8a8','#d4aa88',
+                '#f0d4c0','#c4785e','#e0b090','#dda888','#f5c8a8'];
+
+  let stars=[], wishes=[], animId, animStart=null;
+
+  function rr(c,x,y,w,h,r){
+    c.beginPath();
+    c.moveTo(x+r,y); c.lineTo(x+w-r,y);
+    c.quadraticCurveTo(x+w,y,x+w,y+r);
+    c.lineTo(x+w,y+h-r);
+    c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    c.lineTo(x+r,y+h);
+    c.quadraticCurveTo(x,y+h,x,y+h-r);
+    c.lineTo(x,y+r);
+    c.quadraticCurveTo(x,y,x+r,y);
+    c.closePath();
+  }
+
+  function starPath(cx,cy,r,rot){
+    ctx.beginPath();
+    for(let i=0;i<10;i++){
+      const a=(i*Math.PI/5)+rot;
+      const rad=i%2===0?r:r*0.42;
+      const x=cx+Math.cos(a)*rad, y=cy+Math.sin(a)*rad;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+  }
+
+  function isNightMode(){ return document.body.classList.contains('night'); }
+
+  function drawJar(){
+    ctx.clearRect(0,0,W,H);
+    ctx.save();
+    rr(ctx,JX,JY,JW,JH,JR);
+    ctx.clip();
+    ctx.fillStyle= isNightMode()?'rgba(20,10,50,0.55)':'rgba(237,226,210,0.55)';
+    ctx.fill();
+    stars.forEach(s=>{
+      ctx.save(); ctx.globalAlpha=s.alpha;
+      starPath(s.x,s.y,s.r,s.rot);
+      ctx.fillStyle=s.color; ctx.fill();
+      ctx.strokeStyle='rgba(255,255,255,0.35)';
+      ctx.lineWidth=0.5; ctx.stroke();
+      ctx.restore();
+    });
+    ctx.restore();
+
+    rr(ctx,JX,JY,JW,JH,JR);
+    ctx.strokeStyle= isNightMode()?'rgba(160,120,240,0.45)':'rgba(176,137,104,0.55)';
+    ctx.lineWidth=1.5; ctx.stroke();
+
+    ctx.save();
+    rr(ctx,JX+8,JY+8,16,JH-16,8);
+    ctx.fillStyle='rgba(255,255,255,0.15)'; ctx.fill();
+    ctx.restore();
+
+    rr(ctx,LX,LY,LW,LH,LR);
+    ctx.fillStyle= isNightMode()?'rgba(80,40,160,0.85)':'rgba(176,137,104,0.85)';
+    ctx.fill();
+    ctx.strokeStyle= isNightMode()?'rgba(120,80,220,0.5)':'rgba(130,95,65,0.6)';
+    ctx.lineWidth=1; ctx.stroke();
+    rr(ctx,LX+10,LY+4,30,8,4);
+    ctx.fillStyle='rgba(255,255,255,0.22)'; ctx.fill();
+  }
+
+  function fillRatio(n){ return n===0?0:Math.min(0.08+n*0.055,0.96); }
+
+  function updateFillUI(n){
+    const r=fillRatio(n);
+    fillBar.style.width=(r*100)+'%';
+    fillLbl.textContent=n===0?'empty — add a wish!':n===1?'1 wish inside':`${n} wishes inside`;
+  }
+
+  function buildStars(count, instant){
+    const needed=Math.round(fillRatio(count)*MAX_STARS);
+    if(instant){
+      stars=[];
+      const r=fillRatio(count), fp=r*FILL_H, fy=FILL_BOT-fp;
+      for(let i=0;i<needed;i++){
+        const x=JX+18+Math.random()*(JW-36);
+        const y=fy+Math.random()*Math.max(fp-10,1)+5;
+        stars.push({x,y,targetY:y,r:3.5+Math.random()*3.5,
+          rot:Math.random()*Math.PI*2,rotSpeed:(Math.random()-.5)*.008,
+          color:COLORS[Math.floor(Math.random()*COLORS.length)],
+          alpha:1,falling:false,speed:0,delay:0});
+      }
+      drawJar();
+      loopIdle();
+      return;
+    }
+    const existing=stars.length;
+    if(needed<=existing) return;
+    const r=fillRatio(count), fp=r*FILL_H, fy=FILL_BOT-fp;
+    for(let i=existing;i<needed;i++){
+      const x=JX+18+Math.random()*(JW-36);
+      stars.push({x,y:JY-20,targetY:fy+Math.random()*Math.max(fp-10,1)+5,
+        r:3.5+Math.random()*3.5,rot:Math.random()*Math.PI*2,
+        rotSpeed:(Math.random()-.5)*.08,
+        color:COLORS[Math.floor(Math.random()*COLORS.length)],
+        alpha:0,falling:true,speed:2.5+Math.random()*2,delay:(i-existing)*55});
+    }
+  }
+
+  function loopIdle(){
+    cancelAnimationFrame(animId);
+    function tick(){
+      stars.forEach(s=>{s.rot+=s.rotSpeed;});
+      drawJar();
+      animId=requestAnimationFrame(tick);
+    }
+    animId=requestAnimationFrame(tick);
+  }
+
+  function loopFall(){
+    cancelAnimationFrame(animId);
+    animStart=null;
+    function tick(ts){
+      if(!animStart) animStart=ts;
+      const el=ts-animStart;
+      let any=false;
+      stars.forEach(s=>{
+        if(el<s.delay) return;
+        if(s.falling){
+          any=true;
+          s.y+=s.speed; s.rot+=s.rotSpeed;
+          s.alpha=Math.min(s.alpha+0.06,1);
+          if(s.y>=s.targetY){s.y=s.targetY;s.falling=false;}
+        } else { s.rot+=s.rotSpeed*0.12; }
+      });
+      drawJar();
+      if(any) animId=requestAnimationFrame(tick);
+      else loopIdle();
+    }
+    animId=requestAnimationFrame(tick);
+  }
+
+  function fmt(ts){
+    return new Date(ts).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+  }
+
+  function renderList(ws){
+    listWrap.innerHTML='';
+    [...ws].reverse().forEach(w=>{
+      const d=document.createElement('div');
+      d.className='wish-item-card';
+      d.innerHTML=`<div class="wish-dot-mark"></div><div class="wish-text-body">${w.text}</div><div class="wish-date-stamp">${fmt(w.ts)}</div>`;
+      listWrap.appendChild(d);
+    });
+  }
+
+  async function fetchWishes(){
+    try{
+      const r=await fetch(WISH_SCRIPT_URL);
+      return await r.json();
+    }catch{ return null; }
+  }
+
+  async function postWish(text,ts){
+    await fetch(WISH_SCRIPT_URL,{
+      method:'POST',
+      body:JSON.stringify({text,ts}),
+    });
+  }
+
+  async function addWish(){
+    const text=textarea.value.trim();
+    if(!text) return;
+    addBtn.disabled=true;
+    status.textContent='Saving…';
+    try{
+      const ts=new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'});
+      await postWish(text,ts);
+      wishes=await fetchWishes()||wishes;
+      renderList(wishes);
+      updateFillUI(wishes.length);
+      buildStars(wishes.length,false);
+      loopFall();
+      textarea.value='';
+      status.textContent='Wish saved ✦';
+      setTimeout(()=>status.textContent='',2500);
+    }catch{
+      status.textContent='Could not save — check your script URL.';
+    }
+    addBtn.disabled=false;
+    textarea.focus();
+  }
+
+  addBtn.addEventListener('click',addWish);
+  textarea.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addWish();}
+  });
+
+  (async()=>{
+    drawJar();
+    const ws=await fetchWishes();
+    if(ws&&ws.length){
+      wishes=ws;
+      renderList(wishes);
+      updateFillUI(wishes.length);
+      buildStars(wishes.length,true);
+    }
+    setInterval(async()=>{
+      const ws=await fetchWishes();
+      if(ws&&ws.length!==wishes.length){
+        wishes=ws;
+        renderList(wishes);
+        updateFillUI(wishes.length);
+        buildStars(wishes.length,false);
+        loopFall();
+      }
+    },15000);
+  })();
+})();
+</script>
 </script>
 </body>
 </html>
