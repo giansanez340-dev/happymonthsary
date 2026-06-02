@@ -14,6 +14,8 @@
   const textarea = document.getElementById('wishTextarea');
   const addBtn   = document.getElementById('wishAddBtn');
   const status   = document.getElementById('wishStatus');
+  const nameInput = document.getElementById('wishName');
+  const hiddenList = document.getElementById('wishHiddenList');
 
   const W=200, H=260;
   const JX=30, JY=40, JW=140, JH=195, JR=22;
@@ -171,6 +173,32 @@
       listWrap.appendChild(d);
     });
   }
+  function renderHiddenList(ws){
+  if(!hiddenList) return;
+
+  hiddenList.innerHTML='';
+
+  if(!ws.length){
+    hiddenList.innerHTML = `
+      <div class="hidden-wish-item">
+        No wishes yet ✦
+      </div>
+    `;
+    return;
+  }
+
+  [...ws].reverse().forEach(w=>{
+    const item=document.createElement('div');
+
+    item.className='hidden-wish-item';
+
+    item.innerHTML=`
+      🔒 ${w.name || 'Someone'}'s Wish
+    `;
+
+    hiddenList.appendChild(item);
+  });
+}
 
   async function fetchWishes(){
     try{
@@ -179,35 +207,60 @@
     }catch{ return null; }
   }
 
-  async function postWish(text,ts){
-    await fetch(WISH_SCRIPT_URL,{
-      method:'POST',
-      body:JSON.stringify({text,ts}),
-    });
+async function postWish(name,text,ts){
+  await fetch(WISH_SCRIPT_URL,{
+    method:'POST',
+    body:JSON.stringify({
+      name,
+      text,
+      ts
+    }),
+  });
+}
+
+ async function addWish(){
+  const name = nameInput.value.trim();
+  const text = textarea.value.trim();
+
+  if(!name || !text){
+    status.textContent='Please enter your name and a wish.';
+    return;
   }
 
-  async function addWish(){
-    const text=textarea.value.trim();
-    if(!text) return;
-    addBtn.disabled=true;
-    status.textContent='Saving…';
-    try{
-      const ts=new Date().toLocaleString('en-PH',{timeZone:'Asia/Manila'});
-      await postWish(text,ts);
-      wishes=await fetchWishes()||wishes;
-      renderList(wishes);
-      updateFillUI(wishes.length);
-      buildStars(wishes.length,false);
-      loopFall();
-      textarea.value='';
-      status.textContent='Wish saved ✦';
-      setTimeout(()=>status.textContent='',2500);
-    }catch{
-      status.textContent='Could not save — check your script URL.';
-    }
-    addBtn.disabled=false;
-    textarea.focus();
+  addBtn.disabled=true;
+  status.textContent='Saving…';
+
+  try{
+    const ts=new Date().toISOString();
+
+    await postWish(name,text,ts);
+
+    wishes=await fetchWishes() || wishes;
+
+    renderList(wishes);
+    renderHiddenList(wishes);
+
+    updateFillUI(wishes.length);
+    buildStars(wishes.length,false);
+    loopFall();
+
+    nameInput.value='';
+    textarea.value='';
+
+    status.textContent='Wish saved ✦';
+
+    setTimeout(()=>{
+      status.textContent='';
+    },2500);
+
+  }catch(err){
+    console.error(err);
+    status.textContent='Could not save — check your script URL.';
   }
+
+  addBtn.disabled=false;
+  textarea.focus();
+}
 
   addBtn.addEventListener('click',addWish);
   textarea.addEventListener('keydown',e=>{
@@ -215,23 +268,31 @@
   });
 
   (async()=>{
-    drawJar();
+  drawJar();
+
+  const ws=await fetchWishes();
+
+  if(ws){
+    wishes=ws;
+
+    renderList(wishes);
+    renderHiddenList(wishes);
+
+    updateFillUI(wishes.length);
+    buildStars(wishes.length,true);
+  }
+
+  setInterval(async()=>{
     const ws=await fetchWishes();
-    if(ws&&ws.length){
+
+    if(ws){
       wishes=ws;
+
       renderList(wishes);
+      renderHiddenList(wishes);
+
       updateFillUI(wishes.length);
-      buildStars(wishes.length,true);
+      buildStars(wishes.length,false);
     }
-    setInterval(async()=>{
-      const ws=await fetchWishes();
-      if(ws&&ws.length!==wishes.length){
-        wishes=ws;
-        renderList(wishes);
-        updateFillUI(wishes.length);
-        buildStars(wishes.length,false);
-        loopFall();
-      }
-    },15000);
-  })();
+  },15000);
 })();
