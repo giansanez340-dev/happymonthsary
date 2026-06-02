@@ -5,16 +5,7 @@
 (function() {
   const STORAGE_KEY = 'wishes_jar_data';
 
-  const canvas   = document.getElementById('wishCanvas');
-  const ctx      = canvas.getContext('2d');
-  const fillBar  = document.getElementById('jarFillBar');
-  const fillLbl  = document.getElementById('jarFillLabel');
-  const listWrap = document.getElementById('wishListWrap');
-  const textarea = document.getElementById('wishTextarea');
-  const addBtn   = document.getElementById('wishAddBtn');
-  const status   = document.getElementById('wishStatus');
-  const nameInput = document.getElementById('wishName');
-  const hiddenList = document.getElementById('wishHiddenList');
+  let canvas, ctx, fillBar, fillLbl, listWrap, textarea, addBtn, status, nameInput, hiddenList;
 
   const W=200, H=260;
   const JX=30, JY=40, JW=140, JH=195, JR=22;
@@ -26,6 +17,21 @@
                 '#f0d4c0','#c4785e','#e0b090','#dda888','#f5c8a8'];
 
   let stars=[], wishes=[], animId, animStart=null;
+
+  function initElements() {
+    canvas   = document.getElementById('wishCanvas');
+    if (!canvas) return false;
+    ctx      = canvas.getContext('2d');
+    fillBar  = document.getElementById('jarFillBar');
+    fillLbl  = document.getElementById('jarFillLabel');
+    listWrap = document.getElementById('wishListWrap');
+    textarea = document.getElementById('wishTextarea');
+    addBtn   = document.getElementById('wishAddBtn');
+    status   = document.getElementById('wishStatus');
+    nameInput = document.getElementById('wishName');
+    hiddenList = document.getElementById('wishHiddenList');
+    return true;
+  }
 
   function rr(c,x,y,w,h,r){
     c.beginPath();
@@ -218,7 +224,7 @@
     }
   }
 
-  async function addWish(){
+  function addWish(){
     const name = nameInput.value.trim();
     const text = textarea.value.trim();
 
@@ -267,12 +273,18 @@
     textarea.focus();
   }
 
-  addBtn.addEventListener('click',addWish);
-  textarea.addEventListener('keydown',e=>{
-    if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addWish();}
-  });
+  function init() {
+    if (!initElements()) {
+      console.error('Wish jar elements not found. Retrying...');
+      setTimeout(init, 100);
+      return;
+    }
 
-  (async()=>{
+    addBtn.addEventListener('click',addWish);
+    textarea.addEventListener('keydown',e=>{
+      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addWish();}
+    });
+
     drawJar();
 
     wishes = loadWishes();
@@ -286,5 +298,12 @@
     } else {
       updateFillUI(0);
     }
-  })();
+  }
+
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
