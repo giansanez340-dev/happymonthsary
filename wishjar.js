@@ -295,4 +295,7 @@ async function postWish(name,text,ts){
       buildStars(wishes.length,false);
     }
   },15000);
-})();
+
+})();   // closes async IIFE
+
+})();   // closes outer function
