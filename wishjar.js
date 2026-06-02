@@ -199,7 +199,7 @@
       item.className='hidden-wish-item';
 
       item.innerHTML=`
-        🔒 ${w.name || 'Someone'}'s Wish
+      ${w.name || 'Someone'}'s Wish
       `;
 
       hiddenList.appendChild(item);
