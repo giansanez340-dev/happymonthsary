@@ -407,6 +407,91 @@
     .photo { width:155px; }
     .cd-unit { min-width:70px; padding:1rem 1rem .8rem; }
   }
+
+  /* ── VINYL PLAYER ── */
+#vinylPlayer {
+  position: fixed; bottom: 1.8rem; left: 1.8rem; z-index: 800;
+  display: flex; flex-direction: column; align-items: center; gap: .5rem;
+}
+#vinylBtn {
+  width: 62px; height: 62px; border-radius: 50%;
+  border: none; cursor: pointer; padding: 0;
+  background: none; position: relative;
+  filter: drop-shadow(0 8px 20px rgba(90,63,45,.35));
+  transition: filter .3s;
+}
+body.night #vinylBtn { filter: drop-shadow(0 8px 24px rgba(120,80,220,.5)); }
+#vinylBtn:hover { filter: drop-shadow(0 10px 28px rgba(90,63,45,.5)); }
+body.night #vinylBtn:hover { filter: drop-shadow(0 10px 28px rgba(160,100,255,.6)); }
+#vinylDisc {
+  width: 62px; height: 62px; border-radius: 50%;
+  background: conic-gradient(
+    #1a1008 0deg, #2e1e10 30deg, #1a1008 60deg, #2a1a0c 90deg,
+    #1a1008 120deg, #2e1e10 150deg, #1a1008 180deg, #2a1a0c 210deg,
+    #1a1008 240deg, #2e1e10 270deg, #1a1008 300deg, #2a1a0c 330deg, #1a1008 360deg
+  );
+  border-radius: 50%; position: relative; overflow: hidden;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.06);
+  animation: spin-disc 3s linear infinite paused;
+}
+body.night #vinylDisc {
+  background: conic-gradient(
+    #0e0824 0deg, #1e1040 30deg, #0e0824 60deg, #180c38 90deg,
+    #0e0824 120deg, #1e1040 150deg, #0e0824 180deg, #180c38 210deg,
+    #0e0824 240deg, #1e1040 270deg, #0e0824 300deg, #180c38 330deg, #0e0824 360deg
+  );
+}
+#vinylDisc::before {
+  content: ''; position: absolute; inset: 14px; border-radius: 50%;
+  background: radial-gradient(circle, #c98a7d 0%, #a06050 40%, #7a3a2a 70%, #5a2a1a 100%);
+  box-shadow: inset 0 0 8px rgba(0,0,0,.4), 0 0 0 2px rgba(255,255,255,.08);
+}
+body.night #vinylDisc::before {
+  background: radial-gradient(circle, #c8a8e8 0%, #9060c0 40%, #6030a0 70%, #3a1880 100%);
+}
+#vinylDisc::after {
+  content: ''; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #f7f0e8;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.3);
+  z-index: 2;
+}
+#vinylPlayer.playing #vinylDisc { animation-play-state: running; }
+@keyframes spin-disc { to { transform: rotate(360deg); } }
+
+.vinyl-rings {
+  position: absolute; inset: 0; border-radius: 50%;
+  background:
+    radial-gradient(circle, transparent 26%, rgba(255,255,255,.03) 27%, transparent 28%),
+    radial-gradient(circle, transparent 35%, rgba(255,255,255,.025) 36%, transparent 37%),
+    radial-gradient(circle, transparent 44%, rgba(255,255,255,.02) 45%, transparent 46%),
+    radial-gradient(circle, transparent 53%, rgba(255,255,255,.015) 54%, transparent 55%),
+    radial-gradient(circle, transparent 62%, rgba(255,255,255,.01) 63%, transparent 64%);
+  z-index: 1;
+}
+#vinylLabel {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: .68rem;
+  letter-spacing: .12em; color: var(--gold);
+  text-align: center; max-width: 90px;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .4s, transform .4s;
+  pointer-events: none; line-height: 1.4;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+#vinylPlayer:hover #vinylLabel,
+#vinylPlayer.playing #vinylLabel {
+  opacity: 1; transform: none;
+}
+#vinylPauseIcon {
+  position: absolute; inset: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: rgba(255,255,255,.0);
+  transition: color .3s; z-index: 10; pointer-events: none;
+}
+#vinylBtn:hover #vinylPauseIcon { color: rgba(255,255,255,.55); }
 </style>
 </head>
 <body>
@@ -598,6 +683,23 @@
   </div>
 </div>
 
+<!-- ── VINYL PLAYER ── -->
+<div id="vinylPlayer">
+  <button id="vinylBtn" aria-label="Play / pause music">
+    <div id="vinylDisc">
+      <div class="vinyl-rings"></div>
+    </div>
+    <div id="vinylPauseIcon">▐▐</div>
+  </button>
+  <span id="vinylLabel">Always Be My Baby</span>
+</div>
+<iframe id="ytFrame"
+  src="https://www.youtube.com/embed/FpJxPzveHzA?enablejsapi=1&autoplay=0&controls=0&loop=1&playlist=FpJxPzveHzA"
+  allow="autoplay"
+  style="position:absolute;width:0;height:0;border:0;opacity:0;pointer-events:none;"
+  title="background music">
+</iframe>
+  
 <script>
 /* ════════════════════════════════
    DAY / NIGHT SYSTEM
@@ -939,6 +1041,49 @@ const io = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); } });
 }, { threshold: .12 });
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  /* ════════════════════════════════
+   VINYL PLAYER
+════════════════════════════════ */
+(function() {
+  const player  = document.getElementById('vinylPlayer');
+  const btn     = document.getElementById('vinylBtn');
+  const icon    = document.getElementById('vinylPauseIcon');
+  const frame   = document.getElementById('ytFrame');
+  let ytReady   = false, playing = false, ytPlayer;
+
+  // Load YouTube IFrame API
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+
+  window.onYouTubeIframeAPIReady = function() {
+    ytPlayer = new YT.Player('ytFrame', {
+      events: {
+        onReady: () => { ytReady = true; },
+        onStateChange: (e) => {
+          if (e.data === YT.PlayerState.ENDED) {
+            ytPlayer.seekTo(0); ytPlayer.playVideo();
+          }
+        }
+      }
+    });
+  };
+
+  btn.addEventListener('click', () => {
+    if (!ytReady) return;
+    if (playing) {
+      ytPlayer.pauseVideo();
+      player.classList.remove('playing');
+      icon.textContent = '▶';
+    } else {
+      ytPlayer.playVideo();
+      player.classList.add('playing');
+      icon.textContent = '▐▐';
+    }
+    playing = !playing;
+  });
+})();
 </script>
 </body>
 </html>
