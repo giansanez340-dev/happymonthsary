@@ -6,6 +6,7 @@
   const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzUHDgxAL_kN12wAfmmZKvp7gwi1dtL-w8SxPAab0pwLBBLIuVwsL2dMpYzVrHor-PTIQ/exec';
 
   let canvas, ctx, fillBar, fillLbl, listWrap, textarea, addBtn, status, nameInput, hiddenList;
+  let modal, modalContent, modalClose, modalOverlay;
 
   const W=200, H=260;
   const JX=30, JY=40, JW=140, JH=195, JR=22;
@@ -30,6 +31,13 @@
     status   = document.getElementById('wishStatus');
     nameInput = document.getElementById('wishName');
     hiddenList = document.getElementById('wishHiddenList');
+    
+    // Initialize modal elements
+    modal = document.getElementById('wishModal');
+    modalContent = document.getElementById('wishModalContent');
+    modalClose = document.getElementById('wishModalClose');
+    modalOverlay = document.getElementById('wishModalOverlay');
+    
     return true;
   }
 
@@ -179,6 +187,27 @@
     });
   }
 
+  function openWishModal(wish){
+    if(!modal || !modalContent) return;
+    
+    modalContent.innerHTML=`
+      <div class="modal-wish-header">
+        <h2>${wish.name || 'Someone'}'s Wish</h2>
+        <span class="modal-wish-date">${fmt(wish.ts)}</span>
+      </div>
+      <div class="modal-wish-text">
+        ${wish.text}
+      </div>
+    `;
+    
+    modal.classList.add('active');
+  }
+
+  function closeWishModal(){
+    if(!modal) return;
+    modal.classList.remove('active');
+  }
+
   function renderHiddenList(ws){
     if(!hiddenList) return;
 
@@ -195,12 +224,16 @@
 
     [...ws].reverse().forEach(w=>{
       const item=document.createElement('div');
-
       item.className='hidden-wish-item';
-
+      item.style.cursor='pointer';
+      
       item.innerHTML=`
-      ${w.name || 'Someone'}'s Wish
+        ${w.name || 'Someone'}'s Wish
       `;
+      
+      item.addEventListener('click', ()=>{
+        openWishModal(w);
+      });
 
       hiddenList.appendChild(item);
     });
@@ -212,6 +245,7 @@
       const payload = {
         name: wish.name,
         text: wish.text,
+        date: fmt(wish.ts),
         timestamp: wish.ts
       };
 
@@ -290,6 +324,19 @@
     textarea.addEventListener('keydown',e=>{
       if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addWish();}
     });
+
+    // Modal event listeners
+    if(modalClose){
+      modalClose.addEventListener('click',closeWishModal);
+    }
+    if(modalOverlay){
+      modalOverlay.addEventListener('click',closeWishModal);
+    }
+    if(modal){
+      modal.addEventListener('click',(e)=>{
+        if(e.target===modal) closeWishModal();
+      });
+    }
 
     drawJar();
 
