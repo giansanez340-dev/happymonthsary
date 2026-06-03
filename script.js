@@ -460,6 +460,15 @@ const MOODS = [
   { label: 'Sleepy'},
   { label: 'Cuddly'},
 ];
+const MOOD_COLORS = {
+  'Grateful':    '#f0a868',  // warm amber
+  'Content':     '#88b4d4',  // soft blue
+  'Romantic':    '#c8607c',  // deep rose
+  'Flirtatious': '#d47ab0',  // playful pink
+  'Loving':      '#e8547a',  // bright pink-red
+  'Sleepy':      '#9080c0',  // muted lavender
+  'Cuddly':      '#d4907a',  // cozy terracotta
+};
 
 const TOPI_MOOD_KEY = 'topi_mood';
 const LUNA_MOOD_KEY = 'luna_mood';
@@ -490,21 +499,20 @@ function buildMoodPills(containerId, storageKey, who) {
       pill.style.cursor = 'default';
     }
 
-    pill.addEventListener('click', () => {
-      if (localStorage.getItem('current_visitor') !== who) return;
-      localStorage.setItem(storageKey, mood.label);
-      container.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
-      pill.classList.add('selected');
-      savedEl.textContent = 'mood saved ✦';
-      savedEl.classList.add('show');
-      setTimeout(() => savedEl.classList.remove('show'), 2000);
-    });
+pill.addEventListener('click', () => {
+  if (localStorage.getItem('current_visitor') !== who) return;
+  localStorage.setItem(storageKey, mood.label);
+  container.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
+  pill.classList.add('selected');
 
-    container.appendChild(pill);
-  });
+  // ── change heart color based on mood ──
+  const heartEl = container.closest('.hb-row').querySelector('.hb-heart');
+  if (heartEl) heartEl.style.color = MOOD_COLORS[mood.label] || '#D4537E';
 
-  container.appendChild(savedEl);
-}
+  savedEl.textContent = 'mood saved ✦';
+  savedEl.classList.add('show');
+  setTimeout(() => savedEl.classList.remove('show'), 2000);
+});
 
 function buildAllMoods() {
   buildMoodPills('hbMoodsTopi', TOPI_MOOD_KEY, 'topi');
