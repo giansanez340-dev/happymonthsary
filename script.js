@@ -248,11 +248,27 @@ function renderPerson(who, isMe) {
   const color = who === 'luna' ? '#D4537E' : '#6495ED';
 
   if (!ts) {
-    el.textContent  = `${name} hasn't visited yet`;
+    el.innerHTML    = `${name} hasn't visited yet`;
     dot.style.cssText = 'background:#888780;box-shadow:none';
     msg.textContent = '';
     return;
   }
+
+  const online = isOnline(who);
+  dot.style.cssText = online
+    ? `background:${color};box-shadow:0 0 7px ${color}`
+    : 'background:#888780;box-shadow:none';
+
+  if (online) {
+    el.innerHTML    = isMe ? 'You are here ♥' : `${name} is here right now ♥`;
+    msg.textContent = 'online now';
+  } else {
+    const ago = fmtDiff(Date.now() - ts);
+    el.innerHTML    = `${name} was here<br><span style="font-size:0.85em;opacity:0.7;">${ago}</span>`;
+    const mins = (Date.now() - ts) / 60000;
+    msg.textContent = mins < 60 ? 'just dropped by ♥' : mins < 720 ? 'was here a while ago' : 'has been missed';
+  }
+}
 
   const online = isOnline(who);
   dot.style.cssText = online
@@ -269,27 +285,34 @@ function renderPerson(who, isMe) {
   }
 }
 
-function updateHeartbeat() {
-  const me    = localStorage.getItem('current_visitor');
-  const other = me === 'topi' ? 'luna' : 'topi';
-  const otherName = other === 'topi' ? 'Topi' : 'Luna';
-
-  renderPerson('topi', me === 'topi');
-  renderPerson('luna', me === 'luna');
-
-  const title = document.getElementById('moodTitle');
-  if (title && me) {
-    title.textContent = isOnline(other)
-      ? `${otherName} is here`
-      : `${otherName} was here`;
-  }
+   function updateHeartbeat() {
+     const me    = localStorage.getItem('current_visitor');
+     const other = me === 'topi' ? 'luna' : 'topi';
+     const otherName = other === 'topi' ? 'Topi' : 'Luna';
+   
+     renderPerson('topi', me === 'topi');
+     renderPerson('luna', me === 'luna');
+   
+   const title = document.getElementById('moodTitle');
+   if (title && me) {
+     if (isOnline(other)) {
+       title.textContent = `${otherName} is here`;
+     } else {
+       title.textContent = `${otherName} was here`;
+     }
+   }
 
   const sub = document.getElementById('moodSubtitle');
-  if (sub && me) {
-    const otherTs = window._presence[other] || 0;
-    sub.textContent = !otherTs ? '' : isOnline(other) ? 'active right now' : `last active ${fmtDiff(Date.now() - otherTs)}`;
-  }
-}
+   if (sub && me) {
+     const otherTs = window._presence[other] || 0;
+     if (!otherTs) {
+       sub.textContent = '';
+     } else if (isOnline(other)) {
+       sub.textContent = 'active right now ♥';
+     } else {
+       sub.textContent = fmtDiff(Date.now() - otherTs);
+     }
+   }
 /* ════════════════════════════════
    LOGIN
 ════════════════════════════════ */
