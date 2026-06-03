@@ -209,14 +209,19 @@ async function pushPresence(who) {
 
 async function fetchPresence() {
   try {
-    const res  = await fetch(SHEETS_URL);
-    const data = await res.json();
+    const res  = await fetch(SHEETS_URL, {
+      method: 'GET',
+      redirect: 'follow',
+    });
+    const text = await res.text();
+    const data = JSON.parse(text);
     if (data.topi) window._presence.topi = parseInt(data.topi);
     if (data.luna) window._presence.luna = parseInt(data.luna);
-  } catch(e) {}
+  } catch(e) {
+    console.warn('fetchPresence failed:', e);
+  }
   updateHeartbeat();
 }
-
 function renderPerson(who, isMe) {
   const name  = who === 'topi' ? 'Topi' : 'Luna';
   const ts    = window._presence[who] || 0;
