@@ -1,4 +1,4 @@
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyga0I-6tnf0X7YBSGRoot9nuqTI90rkGyUnzIXWtLkZI24URP_b5mVeYImLUB0TzkaZA/exec';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyga0I-6tnf0X7YBSGRoot9nuqTI90rkGyUnzIXWtLkZI24URP_b5mVeYImLUB0TzkaZA/exec';
 /* ════════════════════════════════
    DAY / NIGHT SYSTEM
 ════════════════════════════════ */
@@ -200,9 +200,9 @@ function isOnline(who) {
 
 async function pushPresence(who) {
   try {
-    await fetch(SHEETS_URL, {
-      method: 'POST',
-      body: JSON.stringify({ who, ts: Date.now() }),
+    await fetch(`${SHEETS_URL}?who=${who}&ts=${Date.now()}`, {
+      method: 'GET',
+      mode: 'no-cors',
     });
   } catch(e) {}
 }
