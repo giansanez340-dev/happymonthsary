@@ -555,14 +555,23 @@ body.night .wish-dot-mark { background: #c8a8e8; }
 .wish-textarea {
   background: rgba(247, 240, 233, 0.1);
   border: 1px solid rgba(247, 240, 233, 0.2);
+  border-radius: 5px;
+  padding: .6rem .85rem;
   color: #f7f0e9;
+  outline: none;
+  resize: none;
 }
-.wish-textarea::placeholder { color: rgba(247, 240, 233, 0.35); }
+
+.wish-textarea::placeholder {
+  color: rgba(247, 240, 233, 0.4);
+}
+
 .wish-textarea:focus {
   border-color: rgba(247, 240, 233, 0.4);
   background: rgba(247, 240, 233, 0.14);
   box-shadow: none;
 }
+
 body.night .wish-textarea {
   background: rgba(255,255,255,.06);
   border-color: rgba(160,120,240,.3); color: var(--text);
@@ -634,17 +643,24 @@ body.night .hidden-wish-item {
 .wish-name-input {
   width: 100%;
   margin-bottom: .6rem;
-
   font-family: 'Cormorant Garamond', serif;
   font-size: 1rem;
-
-  background: rgba(255,255,255,.6);
-  border: 1px solid rgba(176,137,104,.35);
+  background: rgba(247, 240, 233, 0.1);
+  border: 1px solid rgba(247, 240, 233, 0.2);
   border-radius: 5px;
-
   padding: .6rem .85rem;
-  color: var(--espresso);
+  color: #f7f0e9;
   outline: none;
+}
+
+.wish-name-input::placeholder {
+  color: rgba(247, 240, 233, 0.4);
+}
+
+.wish-name-input:focus {
+  border-color: rgba(247, 240, 233, 0.4);
+  background: rgba(247, 240, 233, 0.14);
+  box-shadow: none;
 }
 
 body.night .wish-name-input {
