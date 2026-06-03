@@ -414,7 +414,157 @@
     });
   }
 
-  async function deleteWish(wish, itemEl){
+  function createDeleteModal() {
+    if (document.getElementById('wishDeleteOverlay')) return;
+    const overlay = document.createElement('div');
+    overlay.id = 'wishDeleteOverlay';
+    overlay.innerHTML = `
+      <div id="wishDeleteModal" role="dialog" aria-modal="true">
+        <div class="wd-icon">✦</div>
+        <h3 class="wd-title">Mark as done?</h3>
+        <p class="wd-msg">This wish will be removed from the jar forever.</p>
+        <div class="wd-actions">
+          <button class="wd-cancel" id="wdCancel">Keep it</button>
+          <button class="wd-confirm" id="wdConfirm">Yes, remove</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #wishDeleteOverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: rgba(15,5,30,0.65);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      #wishDeleteOverlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+      #wishDeleteModal {
+        background: linear-gradient(145deg, #fdf6ee, #f5e8d8);
+        border: 1px solid rgba(176,137,104,0.3);
+        border-radius: 18px;
+        padding: 2.2rem 2rem 1.8rem;
+        max-width: 340px;
+        width: 88%;
+        text-align: center;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+        transform: translateY(18px) scale(0.96);
+        transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+        opacity: 0;
+      }
+      body.night #wishDeleteModal {
+        background: linear-gradient(145deg, #1a0e2e, #120928);
+        border-color: rgba(160,120,240,0.25);
+      }
+      #wishDeleteOverlay.open #wishDeleteModal {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      .wd-icon {
+        font-size: 1.4rem;
+        color: #d4907a;
+        margin-bottom: 0.8rem;
+        animation: wm-twinkle 2.4s ease-in-out infinite;
+      }
+      body.night .wd-icon { color: #a070d0; }
+      .wd-title {
+        font-family: 'Dancing Script', cursive;
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #7a4a38;
+        margin: 0 0 0.5rem;
+      }
+      body.night .wd-title { color: #c8a0f0; }
+      .wd-msg {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 1rem;
+        font-style: italic;
+        color: #9a6a58;
+        margin: 0 0 1.6rem;
+        line-height: 1.6;
+      }
+      body.night .wd-msg { color: #b090d8; }
+      .wd-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+      }
+      .wd-cancel, .wd-confirm {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 0.95rem;
+        padding: 0.55rem 1.3rem;
+        border-radius: 50px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.15s, opacity 0.15s;
+        letter-spacing: 0.04em;
+      }
+      .wd-cancel:hover, .wd-confirm:hover { transform: translateY(-1px); }
+      .wd-cancel {
+        background: transparent;
+        border: 1px solid rgba(176,137,104,0.4);
+        color: #9a6a58;
+      }
+      body.night .wd-cancel {
+        border-color: rgba(160,120,240,0.3);
+        color: #b090d8;
+      }
+      .wd-confirm {
+        background: linear-gradient(135deg, #c98a7d, #c4785e);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(196,120,94,0.35);
+      }
+      body.night .wd-confirm {
+        background: linear-gradient(135deg, #7040b0, #5828a0);
+        box-shadow: 0 4px 14px rgba(112,64,176,0.35);
+      }
+    `;
+    document.head.appendChild(style);
+
+    overlay.addEventListener('click', e => { if(e.target === overlay) closeDeleteModal(); });
+    document.getElementById('wdCancel').addEventListener('click', closeDeleteModal);
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeDeleteModal(); });
+  }
+
+  let _pendingDelete = null;
+
+  function openDeleteModal(wish, itemEl) {
+    createDeleteModal();
+    _pendingDelete = { wish, itemEl };
+    const overlay = document.getElementById('wishDeleteOverlay');
+    overlay.classList.add('open');
+
+    // bind confirm fresh each time
+    const confirmBtn = document.getElementById('wdConfirm');
+    const newBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+    newBtn.addEventListener('click', () => {
+      closeDeleteModal();
+      if (_pendingDelete) confirmDeleteWish(_pendingDelete.wish, _pendingDelete.itemEl);
+    });
+
+    document.getElementById('wdCancel').focus();
+  }
+
+  function closeDeleteModal() {
+    const overlay = document.getElementById('wishDeleteOverlay');
+    if (overlay) overlay.classList.remove('open');
+    _pendingDelete = null;
+  }
+
+  async function confirmDeleteWish(wish, itemEl){
     itemEl.style.transition = 'opacity 0.25s, transform 0.25s';
     itemEl.style.opacity = '0';
     itemEl.style.transform = 'translateX(12px)';
@@ -433,6 +583,10 @@
         body: JSON.stringify({ action: 'delete', name: wish.name, text: wish.text, ts: wish.ts })
       });
     }catch(err){ console.error('Failed to delete wish:', err); }
+  }
+
+  async function deleteWish(wish, itemEl){
+    openDeleteModal(wish, itemEl);
   }
 
   // Google Sheets Integration
