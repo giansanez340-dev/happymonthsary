@@ -710,3 +710,28 @@ body.night .wish-name-input {
 @keyframes hb-ripple { 0%{transform:scale(.7);opacity:.8} 100%{transform:scale(1.6);opacity:0} }
 @keyframes hb-beat   { 0%,100%{transform:scale(1)} 14%{transform:scale(1.18)} 28%{transform:scale(1)} 42%{transform:scale(1.1)} 56%{transform:scale(1)} }
 @keyframes hb-blink  { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+/* ── WHO ARE YOU toggle ── */
+.login-who {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 1.4rem;
+}
+.who-btn {
+  padding: 0.45rem 1.4rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--mocha);
+  background: transparent;
+  color: var(--mocha);
+  font-family: var(--serif);
+  font-size: 1rem;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity 0.2s, background 0.2s, color 0.2s;
+}
+.who-btn.active {
+  background: var(--mocha);
+  color: #fff8f0;
+  opacity: 1;
+}
