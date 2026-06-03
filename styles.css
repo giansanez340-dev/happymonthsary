@@ -700,7 +700,7 @@ body.night .wish-name-input {
 }
 .hb-ring-2 { animation-delay: 0.7s; }
 .hb-heart {
-  position: relative; z-index: 1; font-size: 28px; color: #D4537E;
+  position: relative; z-index: 1; font-size: 28px; color: #6495ED;
   animation: hb-beat 1.4s ease-in-out infinite;
 }
 .hb-time { font-size: 1.4rem; font-weight: 500; color: var(--text, #3b2a1a); }
