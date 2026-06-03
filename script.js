@@ -531,10 +531,13 @@ function buildMoodPills(containerId, storageKey, who) {
         if (heartEl) heartEl.style.color = color;
       
         // ── update ripple rings to match ──
-        const rings = container.closest('.hb-row').querySelectorAll('.hb-ring');
-        rings.forEach(ring => {
-          ring.style.background = hexToRgba(color, 0.12);
-        });
+         const row = container.closest('.hb-row');
+         const heartEl = row.querySelector('.hb-heart');
+         const rings = row.querySelector('.hb-pulse').querySelectorAll('.hb-ring');
+         const color = MOOD_COLORS[mood.label] || (who === 'luna' ? '#D4537E' : '#6495ED');
+         
+         if (heartEl) heartEl.style.color = color;
+         rings.forEach(ring => ring.style.setProperty('background', hexToRgba(color, 0.12), 'important'));
       
         savedEl.textContent = 'mood saved ✦';
         savedEl.classList.add('show');
