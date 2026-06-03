@@ -742,3 +742,50 @@ body.night .wish-name-input {
   color: #fff8f0;
   opacity: 1;
 }
+/* ── MOOD PILLS ── */
+.hb-moods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.mood-pill {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(176,137,104,.35);
+  background: transparent;
+  color: var(--mocha);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+}
+.mood-pill:hover {
+  background: rgba(176,137,104,.12);
+  transform: translateY(-1px);
+}
+.mood-pill.selected {
+  background: var(--mocha);
+  color: var(--cream);
+  border-color: var(--mocha);
+}
+body.night .mood-pill {
+  border-color: rgba(160,120,240,.3);
+  color: var(--text-soft);
+}
+body.night .mood-pill.selected {
+  background: #6030a8;
+  border-color: #6030a8;
+  color: #f0ecf8;
+}
+.hb-mood-saved {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  font-style: italic;
+  margin-top: 0.3rem;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.hb-mood-saved.show { opacity: 1; }
