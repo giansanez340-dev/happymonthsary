@@ -339,29 +339,168 @@
     animId=requestAnimationFrame(tick);
   }
 
-  function loopFall(){
-    cancelAnimationFrame(animId);
-    animStart=null;
-    function tick(ts){
-      if(!animStart) animStart=ts;
-      const el=ts-animStart;
-      let any=false;
-      stars.forEach(s=>{
-        if(el<s.delay) return;
-        if(s.falling){
-          any=true;
-          s.y+=s.speed; s.rot+=s.rotSpeed;
-          s.alpha=Math.min(s.alpha+0.06,1);
-          if(s.y>=s.targetY){s.y=s.targetY;s.falling=false;}
-        } else { s.rot+=s.rotSpeed*0.12; }
+  function animateLidOpen(onDone) {
+  let progress = 0;
+  const lidOpenFrames = 18;
+  const lidMaxLift = 28;
+  const lidMaxAngle = -0.38;
+
+  function tick() {
+    progress++;
+    const t = progress / lidOpenFrames;
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+
+    // draw jar with lid lifted
+    ctx.clearRect(0, 0, W, H);
+
+    // draw jar body first
+    ctx.save();
+    rr(ctx, JX, JY, JW, JH, JR);
+    ctx.clip();
+    ctx.fillStyle = isNightMode() ? 'rgba(20,10,50,0.55)' : 'rgba(237,226,210,0.55)';
+    ctx.fill();
+    stars.forEach(s => {
+      ctx.save(); ctx.globalAlpha = s.alpha;
+      starPath(s.x, s.y, s.r, s.rot);
+      ctx.fillStyle = s.color; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 0.5; ctx.stroke();
+      ctx.restore();
+    });
+    ctx.restore();
+
+    rr(ctx, JX, JY, JW, JH, JR);
+    ctx.strokeStyle = isNightMode() ? 'rgba(160,120,240,0.45)' : 'rgba(176,137,104,0.55)';
+    ctx.lineWidth = 1.5; ctx.stroke();
+
+    ctx.save();
+    rr(ctx, JX+8, JY+8, 16, JH-16, 8);
+    ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fill();
+    ctx.restore();
+
+    // draw lid lifted + rotated
+    const liftY = ease * lidMaxLift;
+    const angle = ease * lidMaxAngle;
+    const cx = LX + LW / 2;
+    const cy = LY + LH / 2 - liftY;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+
+    rr(ctx, -LW/2, -LH/2, LW, LH, LR);
+    ctx.fillStyle = isNightMode() ? 'rgba(80,40,160,0.85)' : 'rgba(176,137,104,0.85)';
+    ctx.fill();
+    ctx.strokeStyle = isNightMode() ? 'rgba(120,80,220,0.5)' : 'rgba(130,95,65,0.6)';
+    ctx.lineWidth = 1; ctx.stroke();
+
+    rr(ctx, -LW/2+10, -LH/2+4, 30, 8, 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fill();
+    ctx.restore();
+
+    if (progress < lidOpenFrames) {
+      animId = requestAnimationFrame(tick);
+    } else {
+      // hold open briefly then close
+      setTimeout(() => animateLidClose(onDone), 320);
+    }
+  }
+  cancelAnimationFrame(animId);
+  animId = requestAnimationFrame(tick);
+}
+
+function animateLidClose(onDone) {
+  let progress = 0;
+  const lidCloseFrames = 14;
+  const lidMaxLift = 28;
+  const lidMaxAngle = -0.38;
+
+  function tick() {
+    progress++;
+    const t = progress / lidCloseFrames;
+    const ease = 1 - (t < 0.5 ? 2*t*t : -1+(4-2*t)*t);
+
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.save();
+    rr(ctx, JX, JY, JW, JH, JR);
+    ctx.clip();
+    ctx.fillStyle = isNightMode() ? 'rgba(20,10,50,0.55)' : 'rgba(237,226,210,0.55)';
+    ctx.fill();
+    stars.forEach(s => {
+      ctx.save(); ctx.globalAlpha = s.alpha;
+      starPath(s.x, s.y, s.r, s.rot);
+      ctx.fillStyle = s.color; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 0.5; ctx.stroke();
+      ctx.restore();
+    });
+    ctx.restore();
+
+    rr(ctx, JX, JY, JW, JH, JR);
+    ctx.strokeStyle = isNightMode() ? 'rgba(160,120,240,0.45)' : 'rgba(176,137,104,0.55)';
+    ctx.lineWidth = 1.5; ctx.stroke();
+
+    ctx.save();
+    rr(ctx, JX+8, JY+8, 16, JH-16, 8);
+    ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fill();
+    ctx.restore();
+
+    const liftY = ease * lidMaxLift;
+    const angle = ease * lidMaxAngle;
+    const cx = LX + LW / 2;
+    const cy = LY + LH / 2 - liftY;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(angle);
+
+    rr(ctx, -LW/2, -LH/2, LW, LH, LR);
+    ctx.fillStyle = isNightMode() ? 'rgba(80,40,160,0.85)' : 'rgba(176,137,104,0.85)';
+    ctx.fill();
+    ctx.strokeStyle = isNightMode() ? 'rgba(120,80,220,0.5)' : 'rgba(130,95,65,0.6)';
+    ctx.lineWidth = 1; ctx.stroke();
+
+    rr(ctx, -LW/2+10, -LH/2+4, 30, 8, 4);
+    ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fill();
+    ctx.restore();
+
+    if (progress < lidCloseFrames) {
+      animId = requestAnimationFrame(tick);
+    } else {
+      drawJar();
+      if (onDone) onDone();
+    }
+  }
+  animId = requestAnimationFrame(tick);
+}
+
+function loopFall() {
+  cancelAnimationFrame(animId);
+  animStart = null;
+
+  // open lid first, then drop stars, then close lid
+  animateLidOpen(() => {
+    function tick(ts) {
+      if (!animStart) animStart = ts;
+      const el = ts - animStart;
+      let any = false;
+      stars.forEach(s => {
+        if (el < s.delay) return;
+        if (s.falling) {
+          any = true;
+          s.y += s.speed; s.rot += s.rotSpeed;
+          s.alpha = Math.min(s.alpha + 0.06, 1);
+          if (s.y >= s.targetY) { s.y = s.targetY; s.falling = false; }
+        } else { s.rot += s.rotSpeed * 0.12; }
       });
       drawJar();
-      if(any) animId=requestAnimationFrame(tick);
+      if (any) animId = requestAnimationFrame(tick);
       else loopIdle();
     }
-    animId=requestAnimationFrame(tick);
-  }
-
+    animId = requestAnimationFrame(tick);
+  });
+}
   function fmt(ts){
     return new Date(ts).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
   }
