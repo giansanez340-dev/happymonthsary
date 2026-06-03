@@ -381,23 +381,58 @@
     hiddenList.innerHTML='';
 
     if(!ws.length){
-      hiddenList.innerHTML = `<div class="hidden-wish-item">No wishes yet ✦</div>`;
+      hiddenList.innerHTML = '<div class="hidden-wish-item">No wishes yet ✦</div>';
       return;
     }
 
-    [...ws].reverse().forEach((w, i)=>{
+    [...ws].reverse().forEach((w)=>{
       const item = document.createElement('div');
       item.className = 'hidden-wish-item';
-      item.innerHTML = `<span>${w.name || 'Someone'}'s Wish</span>`;
-      item.setAttribute('role', 'button');
-      item.setAttribute('tabindex', '0');
-      item.setAttribute('aria-label', `Open wish from ${w.name || 'Someone'}`);
-      item.addEventListener('click', () => openWishModal(w));
-      item.addEventListener('keydown', e => {
+      item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:0.5rem;';
+
+      const label = document.createElement('span');
+      label.textContent = (w.name || 'Someone') + "'s Wish";
+      label.style.cssText = 'flex:1;cursor:pointer;';
+      label.setAttribute('role', 'button');
+      label.setAttribute('tabindex', '0');
+      label.addEventListener('click', () => openWishModal(w));
+      label.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openWishModal(w); }
       });
+
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '×';
+      delBtn.setAttribute('aria-label', 'Delete wish');
+      delBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:1.1rem;line-height:1;padding:0 0.2rem;color:#c98a7d;opacity:0.45;transition:opacity 0.15s,transform 0.15s;flex-shrink:0;';
+      delBtn.addEventListener('mouseenter', () => { delBtn.style.opacity='1'; delBtn.style.transform='scale(1.2)'; });
+      delBtn.addEventListener('mouseleave', () => { delBtn.style.opacity='0.45'; delBtn.style.transform='scale(1)'; });
+      delBtn.addEventListener('click', (e) => { e.stopPropagation(); deleteWish(w, item); });
+
+      item.appendChild(label);
+      item.appendChild(delBtn);
       hiddenList.appendChild(item);
     });
+  }
+
+  async function deleteWish(wish, itemEl){
+    itemEl.style.transition = 'opacity 0.25s, transform 0.25s';
+    itemEl.style.opacity = '0';
+    itemEl.style.transform = 'translateX(12px)';
+    setTimeout(() => itemEl.remove(), 270);
+
+    wishes = wishes.filter(w => !(w.name === wish.name && w.text === wish.text && w.ts === wish.ts));
+    updateFillUI(wishes.length);
+    buildStars(wishes.length, true);
+    if(!wishes.length) setTimeout(() => renderHiddenList([]), 290);
+
+    try{
+      await fetch(GOOGLE_SHEETS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'delete', name: wish.name, text: wish.text, ts: wish.ts })
+      });
+    }catch(err){ console.error('Failed to delete wish:', err); }
   }
 
   // Google Sheets Integration
