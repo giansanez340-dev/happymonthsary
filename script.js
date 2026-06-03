@@ -204,7 +204,7 @@ function renderPerson(key, name, elId, dotId, msgId) {
   const mins = (Date.now() - parseInt(last)) / 60000;
   el.textContent = `${name} was here ${fmtDiff(mins)}`;
   if (mins < 60) {
-    dot.style.background = name === 'Luna' ? '#6495ED' : '#D4537E';
+    dot.style.background = name === 'Luna' ? '#D4537E' : '#6495ED';
     msg.textContent = 'just dropped by ♥';
   } else if (mins < 720) {
     dot.style.background = '#EF9F27';
@@ -464,8 +464,8 @@ const MOODS = [
 ];
 
 const MOOD_COLORS = {
-  'Happy':       '#D4537E',
-  'Sad':         '#6495ED',
+  'Happy':       '#6495ED', 
+  'Sad':         '#D4537E',  
   'Grateful':    '#f0a868',
   'Content':     '#88b4d4',
   'Romantic':    '#c8607c',
@@ -491,7 +491,7 @@ function buildMoodPills(containerId, storageKey, who) {
       const heartEl = document.getElementById(containerId)
         ?.closest('.hb-row')
         ?.querySelector('.hb-heart');
-      if (heartEl) heartEl.style.color = MOOD_COLORS[saved];
+      if (heartEl) heartEl.style.color = who === 'luna' ? '#D4537E' : '#6495ED';
     }, 0);
   }
 
