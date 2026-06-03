@@ -262,7 +262,7 @@ function tryLogin() {
   const y = parseInt(yEl.value, 10);
 
   const topiDate = m === 4 && d === 17 && y === 2026;
-  const lunaDate = m === 4 && d === 17 && y === 2025;
+  const lunaDate = m === 4 && d === 17 && y === 2026;
 
   if ((selectedWho === 'topi' && topiDate) || (selectedWho === 'luna' && lunaDate)) {
     unlock(selectedWho);
