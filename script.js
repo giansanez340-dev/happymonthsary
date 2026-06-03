@@ -252,6 +252,7 @@ function unlock(who) {
   setTimeout(() => {
     loginScreen.style.display = 'none';
     updateHeartbeat();
+    buildAllMoods();
   }, 900);
 }
 
@@ -446,3 +447,68 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 ════════════════════════════════ */
 updateHeartbeat();
 setInterval(updateHeartbeat, 30000);
+
+/* ════════════════════════════════
+   MOOD PILLS
+════════════════════════════════ */
+const MOODS = [
+  { label: 'Grateful'},
+  { label: 'Content'},
+  { label: 'Romantic'},
+  { label: 'Flirtatious'},
+  { label: 'Loving'},
+  { label: 'Sleepy'},
+  { label: 'Cuddly'},
+];
+
+const TOPI_MOOD_KEY = 'topi_mood';
+const LUNA_MOOD_KEY = 'luna_mood';
+
+function buildMoodPills(containerId, storageKey, who) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+
+  const saved = localStorage.getItem(storageKey);
+
+  // saved label display
+  const savedEl = document.createElement('p');
+  savedEl.className = 'hb-mood-saved';
+  savedEl.id = containerId + 'Status';
+
+  MOODS.forEach(mood => {
+    const pill = document.createElement('button');
+    pill.className = 'mood-pill' + (saved === mood.label ? ' selected' : '');
+    pill.textContent = mood.label;
+    pill.setAttribute('aria-label', mood.label);
+
+    // only the current visitor can change their own mood
+    const currentVisitor = localStorage.getItem('current_visitor');
+    if (currentVisitor !== who) {
+      pill.disabled = true;
+      pill.style.opacity = saved === mood.label ? '1' : '0.35';
+      pill.style.cursor = 'default';
+    }
+
+    pill.addEventListener('click', () => {
+      if (localStorage.getItem('current_visitor') !== who) return;
+      localStorage.setItem(storageKey, mood.label);
+      container.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
+      pill.classList.add('selected');
+      savedEl.textContent = 'mood saved ✦';
+      savedEl.classList.add('show');
+      setTimeout(() => savedEl.classList.remove('show'), 2000);
+    });
+
+    container.appendChild(pill);
+  });
+
+  container.appendChild(savedEl);
+}
+
+function buildAllMoods() {
+  buildMoodPills('hbMoodsTopi', TOPI_MOOD_KEY, 'topi');
+  buildMoodPills('hbMoodsLuna', LUNA_MOOD_KEY, 'luna');
+}
+
+buildAllMoods();
