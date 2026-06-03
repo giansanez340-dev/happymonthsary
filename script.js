@@ -452,6 +452,8 @@ setInterval(updateHeartbeat, 30000);
    MOOD PILLS
 ════════════════════════════════ */
 const MOODS = [
+  { label: 'Happy'       },
+  { label: 'Sad'         },
   { label: 'Grateful'    },
   { label: 'Content'     },
   { label: 'Romantic'    },
@@ -462,6 +464,8 @@ const MOODS = [
 ];
 
 const MOOD_COLORS = {
+  'Happy':       '#D4537E',
+  'Sad':         '#6495ED',
   'Grateful':    '#f0a868',
   'Content':     '#88b4d4',
   'Romantic':    '#c8607c',
