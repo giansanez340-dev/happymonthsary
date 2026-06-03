@@ -388,12 +388,7 @@
     [...ws].reverse().forEach((w, i)=>{
       const item = document.createElement('div');
       item.className = 'hidden-wish-item';
-      // Truncated peek text
-      const peek = w.text.length > 38 ? w.text.slice(0, 38) + '…' : w.text;
-      item.innerHTML = `
-        <span>${w.name || 'Someone'}'s Wish</span>
-        <span class="wm-peek">${peek}</span>
-      `;
+      item.innerHTML = `<span>${w.name || 'Someone'}'s Wish</span>`;
       item.setAttribute('role', 'button');
       item.setAttribute('tabindex', '0');
       item.setAttribute('aria-label', `Open wish from ${w.name || 'Someone'}`);
