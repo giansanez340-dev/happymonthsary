@@ -614,30 +614,30 @@ body.night .wish-add-btn { background: linear-gradient(135deg, #6030a8, #3a1880)
   display: flex;
   gap: 2rem;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch;   /* was flex-start */
   flex-wrap: wrap;
 }
-
 .wish-right {
   width: 320px;
   text-align: left;
-
   background: var(--card-bg);
   border: 1px solid rgba(176,137,104,.2);
   border-radius: 10px;
-
   padding: 1rem;
-  min-height: 260px;
+  display: flex;
+  flex-direction: column;
 }
 
 body.night .wish-right {
   border-color: rgba(160,120,240,.2);
 }
 
+
 .wish-right h3 {
   margin: 0 0 1rem;
   text-align: center;
   font-family: 'Cormorant Garamond', serif;
+  flex-shrink: 0;
 }
 
 #wishHiddenList {
@@ -646,15 +646,15 @@ body.night .wish-right {
   gap: .5rem;
 }
 
-.hidden-wish-item {
-  padding: .7rem .9rem;
-  border-radius: 6px;
-
-  background: rgba(255,255,255,.45);
-  border: 1px solid rgba(176,137,104,.15);
-
-  font-size: .95rem;
-  color: var(--text);
+#wishHiddenList {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: #d4aa88 transparent;
+  padding-right: 0.3rem;
 }
 
 body.night .hidden-wish-item {
