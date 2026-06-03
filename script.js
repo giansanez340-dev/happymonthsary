@@ -247,15 +247,24 @@ function unlock(who) {
   }, 900);
 }
 
+let selectedWho = 'topi'; // default
+
+function selectWho(who) {
+  selectedWho = who;
+  document.getElementById('whoTopi').classList.toggle('active', who === 'topi');
+  document.getElementById('whoLuna').classList.toggle('active', who === 'luna');
+}
+
 function tryLogin() {
   const m = parseInt(mEl.value, 10);
   const d = parseInt(dEl.value, 10);
   const y = parseInt(yEl.value, 10);
-  if (m === 4 && d === 17 && y === 2026) {
-    unlock('topi');
-  } else if (m === 4 && d === 17 && y === 2025) {
-    // Nicole's (Luna's) secret date — change this to any date she'll remember
-    unlock('luna');
+
+  const topiDate = m === 4 && d === 17 && y === 2026;
+  const lunaDate = m === 4 && d === 17 && y === 2025; // Nicole's secret date
+
+  if ((selectedWho === 'topi' && topiDate) || (selectedWho === 'luna' && lunaDate)) {
+    unlock(selectedWho);
   } else {
     loginError.classList.add('show');
     mEl.value = ''; dEl.value = ''; yEl.value = '';
@@ -263,11 +272,6 @@ function tryLogin() {
     setTimeout(() => loginError.classList.remove('show'), 3200);
   }
 }
-
-loginBtn.addEventListener('click', tryLogin);
-[mEl, dEl, yEl].forEach(el => {
-  el.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
-});
 
 /* ════════════════════════════════
    COUNTDOWN
