@@ -175,12 +175,14 @@ function buildFireflies() {
 }
 
 /* ════════════════════════════════
-   HEARTBEAT
+   HEARTBEAT + PRESENCE
 ════════════════════════════════ */
-const TOPI_KEY = 'topi_last_visit';
-const LUNA_KEY = 'luna_last_visit';
+const TOPI_KEY      = 'topi_last_visit';
+const LUNA_KEY      = 'luna_last_visit';
+const ONLINE_WINDOW = 90000; // 90s without a ping = offline
 
-function fmtDiff(mins) {
+function fmtDiff(ms) {
+  const mins = ms / 60000;
   if (mins < 1)  return 'just now';
   if (mins < 60) return `${Math.round(mins)} minute${Math.round(mins) === 1 ? '' : 's'} ago`;
   const h = Math.floor(mins / 60), m = Math.round(mins % 60);
@@ -189,37 +191,56 @@ function fmtDiff(mins) {
   return d === 1 ? 'yesterday' : `${d} days ago`;
 }
 
-function renderPerson(key, name, elId, dotId, msgId) {
+function isOnline(key) {
+  const ts = parseInt(localStorage.getItem(key) || '0');
+  return ts && (Date.now() - ts) < ONLINE_WINDOW;
+}
+
+function renderPerson(key, name, elId, dotId, msgId, isMe) {
   const last = localStorage.getItem(key);
   const el   = document.getElementById(elId);
   const dot  = document.getElementById(dotId);
   const msg  = document.getElementById(msgId);
   if (!el) return;
+
   if (!last) {
     el.textContent  = `${name} hasn't visited yet`;
-    if (dot) dot.style.background = '#888780';
+    if (dot) dot.style.cssText = 'background:#888780;box-shadow:none';
     if (msg) msg.textContent = '';
     return;
   }
-  const mins = (Date.now() - parseInt(last)) / 60000;
-  el.textContent = `${name} was here ${fmtDiff(mins)}`;
-  if (mins < 60) {
-    dot.style.background = name === 'Luna' ? '#D4537E' : '#6495ED';
-    msg.textContent = 'just dropped by ♥';
-  } else if (mins < 720) {
-    dot.style.background = '#EF9F27';
-    msg.textContent = 'was here a while ago';
+
+  const online = isOnline(key);
+  const ms     = Date.now() - parseInt(last);
+
+  if (dot) dot.style.cssText = online
+    ? `background:${name === 'Luna' ? '#D4537E' : '#6495ED'};box-shadow:0 0 7px ${name === 'Luna' ? '#D4537E' : '#6495ED'}`
+    : 'background:#888780;box-shadow:none';
+
+  if (online) {
+    el.textContent  = isMe ? `You are here ♥` : `${name} is here right now ♥`;
+    if (msg) msg.textContent = 'online now';
   } else {
-    dot.style.background = '#888780';
-    msg.textContent = 'has been missed';
+    el.textContent  = `${name} was here ${fmtDiff(ms)}`;
+    const mins = ms / 60000;
+    if (msg) msg.textContent = mins < 60 ? 'just dropped by ♥' : mins < 720 ? 'was here a while ago' : 'has been missed';
   }
 }
 
 function updateHeartbeat() {
-  renderPerson(TOPI_KEY, 'Topi', 'hbTimeTopi', 'hbDotTopi', 'hbMsgTopi');
-  renderPerson(LUNA_KEY, 'Luna', 'hbTimeLuna', 'hbDotLuna', 'hbMsgLuna');
-}
+  const me = localStorage.getItem('current_visitor');
+  renderPerson(TOPI_KEY, 'Topi', 'hbTimeTopi', 'hbDotTopi', 'hbMsgTopi', me === 'topi');
+  renderPerson(LUNA_KEY, 'Luna', 'hbTimeLuna', 'hbDotLuna', 'hbMsgLuna', me === 'luna');
 
+  const other     = me === 'topi' ? 'luna' : 'topi';
+  const otherName = other === 'topi' ? 'Topi' : 'Luna';
+  const title     = document.getElementById('moodTitle');
+  if (title && me) {
+    title.textContent = isOnline(other === 'topi' ? TOPI_KEY : LUNA_KEY)
+      ? `${otherName} is here`
+      : `${otherName} was here`;
+  }
+}
 /* ════════════════════════════════
    LOGIN
 ════════════════════════════════ */
@@ -247,6 +268,10 @@ function unlock(who) {
   localStorage.setItem('current_visitor', who);
   const key = who === 'luna' ? LUNA_KEY : TOPI_KEY;
   localStorage.setItem(key, Date.now().toString());
+
+  // Keep-alive ping every 30s so the other person sees "is here"
+  setInterval(() => localStorage.setItem(key, Date.now().toString()), 30000);
+
   loginScreen.classList.add('hide');
   loginError.classList.remove('show');
   setTimeout(() => {
@@ -445,8 +470,9 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
    (no stamping here — stamping
    only happens inside unlock())
 ════════════════════════════════ */
+
 updateHeartbeat();
-setInterval(updateHeartbeat, 30000);
+setInterval(updateHeartbeat, 5000);
 
 /* ════════════════════════════════
    MOOD PILLS
