@@ -615,12 +615,13 @@ body.night .wish-add-btn { background: linear-gradient(135deg, #6030a8, #3a1880)
   width: 320px;
   text-align: left;
 
-  background: var(--card-bg);
+  background: rgba(107, 78, 57, 0.45);  /* was var(--card-bg) */
   border: 1px solid rgba(176,137,104,.2);
   border-radius: 10px;
 
   padding: 1rem;
   min-height: 260px;
+  color: #f7f0e9;  /* add this */
 }
 
 body.night .wish-right {
@@ -631,6 +632,7 @@ body.night .wish-right {
   margin: 0 0 1rem;
   text-align: center;
   font-family: 'Cormorant Garamond', serif;
+  color: #f7f0e9;  /* add this */
 }
 
 #wishHiddenList {
