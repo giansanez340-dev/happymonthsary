@@ -573,8 +573,18 @@ body.night .wish-textarea {
   box-shadow: 0 0 0 3px rgba(176,137,104,.12);
 }
 body.night .wish-textarea:focus { box-shadow: 0 0 0 3px rgba(160,120,240,.15); }
-.wish-add-btn:hover { background: rgba(247, 240, 233, 0.22); box-shadow: none; }
+.wish-add-btn {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .88rem; letter-spacing: .14em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--mocha), var(--mocha-deep));
+  color: var(--cream); border: none; border-radius: 5px;
+  padding: 0 1.3rem; cursor: pointer;
+  transition: transform .25s, box-shadow .25s;
+  white-space: nowrap; flex-shrink: 0;
+}
 body.night .wish-add-btn { background: linear-gradient(135deg, #6030a8, #3a1880); }
+.wish-add-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -6px rgba(90,63,45,.4); }
 .wish-add-btn:active { transform: scale(.97); }
 .wish-status {
   font-size: .72rem; letter-spacing: .16em;
