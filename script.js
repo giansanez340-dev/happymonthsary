@@ -1,3 +1,4 @@
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyga0I-6tnf0X7YBSGRoot9nuqTI90rkGyUnzIXWtLkZI24URP_b5mVeYImLUB0TzkaZA/exec';
 /* ════════════════════════════════
    DAY / NIGHT SYSTEM
 ════════════════════════════════ */
@@ -175,11 +176,13 @@ function buildFireflies() {
 }
 
 /* ════════════════════════════════
-   HEARTBEAT + PRESENCE
+   HEARTBEAT + PRESENCE (Sheets)
 ════════════════════════════════ */
-const TOPI_KEY      = 'topi_last_visit';
-const LUNA_KEY      = 'luna_last_visit';
-const ONLINE_WINDOW = 90000; // 90s without a ping = offline
+const TOPI_KEY     = 'topi_last_visit';
+const LUNA_KEY     = 'luna_last_visit';
+const ONLINE_WINDOW = 90000;
+
+window._presence = { topi: 0, luna: 0 };
 
 function fmtDiff(ms) {
   const mins = ms / 60000;
@@ -191,54 +194,80 @@ function fmtDiff(ms) {
   return d === 1 ? 'yesterday' : `${d} days ago`;
 }
 
-function isOnline(key) {
-  const ts = parseInt(localStorage.getItem(key) || '0');
-  return ts && (Date.now() - ts) < ONLINE_WINDOW;
+function isOnline(who) {
+  return window._presence[who] && (Date.now() - window._presence[who]) < ONLINE_WINDOW;
 }
 
-function renderPerson(key, name, elId, dotId, msgId, isMe) {
-  const last = localStorage.getItem(key);
-  const el   = document.getElementById(elId);
-  const dot  = document.getElementById(dotId);
-  const msg  = document.getElementById(msgId);
+async function pushPresence(who) {
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      body: JSON.stringify({ who, ts: Date.now() }),
+    });
+  } catch(e) {}
+}
+
+async function fetchPresence() {
+  try {
+    const res  = await fetch(SHEETS_URL);
+    const data = await res.json();
+    if (data.topi) window._presence.topi = parseInt(data.topi);
+    if (data.luna) window._presence.luna = parseInt(data.luna);
+  } catch(e) {}
+  updateHeartbeat();
+}
+
+function renderPerson(who, isMe) {
+  const name  = who === 'topi' ? 'Topi' : 'Luna';
+  const ts    = window._presence[who] || 0;
+  const el    = document.getElementById(who === 'topi' ? 'hbTimeTopi' : 'hbTimeLuna');
+  const dot   = document.getElementById(who === 'topi' ? 'hbDotTopi'  : 'hbDotLuna');
+  const msg   = document.getElementById(who === 'topi' ? 'hbMsgTopi'  : 'hbMsgLuna');
   if (!el) return;
 
-  if (!last) {
+  const color = who === 'luna' ? '#D4537E' : '#6495ED';
+
+  if (!ts) {
     el.textContent  = `${name} hasn't visited yet`;
-    if (dot) dot.style.cssText = 'background:#888780;box-shadow:none';
-    if (msg) msg.textContent = '';
+    dot.style.cssText = 'background:#888780;box-shadow:none';
+    msg.textContent = '';
     return;
   }
 
-  const online = isOnline(key);
-  const ms     = Date.now() - parseInt(last);
-
-  if (dot) dot.style.cssText = online
-    ? `background:${name === 'Luna' ? '#D4537E' : '#6495ED'};box-shadow:0 0 7px ${name === 'Luna' ? '#D4537E' : '#6495ED'}`
+  const online = isOnline(who);
+  dot.style.cssText = online
+    ? `background:${color};box-shadow:0 0 7px ${color}`
     : 'background:#888780;box-shadow:none';
 
   if (online) {
-    el.textContent  = isMe ? `You are here ♥` : `${name} is here right now ♥`;
-    if (msg) msg.textContent = 'online now';
+    el.textContent = isMe ? 'You are here ♥' : `${name} is here right now ♥`;
+    msg.textContent = 'online now';
   } else {
-    el.textContent  = `${name} was here ${fmtDiff(ms)}`;
-    const mins = ms / 60000;
-    if (msg) msg.textContent = mins < 60 ? 'just dropped by ♥' : mins < 720 ? 'was here a while ago' : 'has been missed';
+    el.textContent  = `${name} was here ${fmtDiff(Date.now() - ts)}`;
+    const mins = (Date.now() - ts) / 60000;
+    msg.textContent = mins < 60 ? 'just dropped by ♥' : mins < 720 ? 'was here a while ago' : 'has been missed';
   }
 }
 
 function updateHeartbeat() {
-  const me = localStorage.getItem('current_visitor');
-  renderPerson(TOPI_KEY, 'Topi', 'hbTimeTopi', 'hbDotTopi', 'hbMsgTopi', me === 'topi');
-  renderPerson(LUNA_KEY, 'Luna', 'hbTimeLuna', 'hbDotLuna', 'hbMsgLuna', me === 'luna');
-
-  const other     = me === 'topi' ? 'luna' : 'topi';
+  const me    = localStorage.getItem('current_visitor');
+  const other = me === 'topi' ? 'luna' : 'topi';
   const otherName = other === 'topi' ? 'Topi' : 'Luna';
-  const title     = document.getElementById('moodTitle');
+
+  renderPerson('topi', me === 'topi');
+  renderPerson('luna', me === 'luna');
+
+  const title = document.getElementById('moodTitle');
   if (title && me) {
-    title.textContent = isOnline(other === 'topi' ? TOPI_KEY : LUNA_KEY)
+    title.textContent = isOnline(other)
       ? `${otherName} is here`
       : `${otherName} was here`;
+  }
+
+  const sub = document.getElementById('moodSubtitle');
+  if (sub && me) {
+    const otherTs = window._presence[other] || 0;
+    sub.textContent = !otherTs ? '' : isOnline(other) ? 'active right now' : `last active ${fmtDiff(Date.now() - otherTs)}`;
   }
 }
 /* ════════════════════════════════
@@ -266,11 +295,8 @@ function selectWho(who) {
 
 function unlock(who) {
   localStorage.setItem('current_visitor', who);
-  const key = who === 'luna' ? LUNA_KEY : TOPI_KEY;
-  localStorage.setItem(key, Date.now().toString());
-
-  // Keep-alive ping every 30s so the other person sees "is here"
-  setInterval(() => localStorage.setItem(key, Date.now().toString()), 30000);
+  pushPresence(who);
+  setInterval(() => pushPresence(who), 30000); // keep-alive ping
 
   loginScreen.classList.add('hide');
   loginError.classList.remove('show');
@@ -471,8 +497,8 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
    only happens inside unlock())
 ════════════════════════════════ */
 
-updateHeartbeat();
-setInterval(updateHeartbeat, 5000);
+fetchPresence();
+setInterval(fetchPresence, 10000); // poll every 10s
 
 /* ════════════════════════════════
    MOOD PILLS
