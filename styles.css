@@ -508,7 +508,7 @@ body.night #vinylDisc::before {
 .jar-canvas-wrap {
   position: relative; width: 200px; margin: 0 auto 1rem;
 }
-#wishCanvas { display: block; width: 200px; height: 260px; }
+#wishCanvas { display: block; width: 200px; height: 290px; }
 .jar-fill-wrap {
   width: 160px; margin: .4rem auto .2rem;
   height: 6px;
