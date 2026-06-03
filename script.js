@@ -473,11 +473,17 @@ const MOOD_COLORS = {
 const TOPI_MOOD_KEY = 'topi_mood';
 const LUNA_MOOD_KEY = 'luna_mood';
 
-function buildMoodPills(containerId, storageKey, who) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
+const saved = localStorage.getItem(storageKey);
 
+// restore heart color on load
+if (saved && MOOD_COLORS[saved]) {
+  setTimeout(() => {
+    const heartEl = document.querySelector(`#${containerId}`)
+      ?.closest('.hb-row')
+      ?.querySelector('.hb-heart');
+    if (heartEl) heartEl.style.color = MOOD_COLORS[saved];
+  }, 0);
+}
   const saved = localStorage.getItem(storageKey);
 
   // saved label display
