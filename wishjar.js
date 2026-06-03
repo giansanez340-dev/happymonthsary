@@ -466,6 +466,28 @@
     drawJar();
     wishes = [];
     updateFillUI(0);
+
+    // Load existing wishes from Google Sheets
+    loadWishes();
+  }
+
+  async function loadWishes(){
+    try{
+      status.textContent = 'Loading wishes…';
+      const res = await fetch(GOOGLE_SHEETS_URL, { method: 'GET' });
+      const data = await res.json();
+      if(Array.isArray(data) && data.length){
+        wishes = data.filter(w => w.name && w.text && w.ts);
+        renderList(wishes);
+        renderHiddenList(wishes);
+        updateFillUI(wishes.length);
+        buildStars(wishes.length, true);
+      }
+      status.textContent = '';
+    }catch(err){
+      console.error('Failed to load wishes:', err);
+      status.textContent = '';
+    }
   }
 
   if (document.readyState === 'loading') {
