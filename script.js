@@ -201,14 +201,26 @@ function autoTab(el, next) {
 }
 autoTab(mEl, dEl); autoTab(dEl, yEl);
 
+function unlock(who) {
+  localStorage.setItem('current_visitor', who);
+  // stamp their visit immediately
+  const key = who === 'luna' ? 'luna_last_visit' : 'topi_last_visit';
+  localStorage.setItem(key, Date.now().toString());
+  loginScreen.classList.add('hide');
+  loginError.classList.remove('show');
+  setTimeout(() => { loginScreen.style.display = 'none'; updateHeartbeat(); }, 900);
+}
+
 function tryLogin() {
   const m = parseInt(mEl.value, 10);
   const d = parseInt(dEl.value, 10);
   const y = parseInt(yEl.value, 10);
+
   if (m === 4 && d === 17 && y === 2026) {
-    loginScreen.classList.add('hide');
-    loginError.classList.remove('show');
-    setTimeout(() => { loginScreen.style.display = 'none'; }, 900);
+    unlock('topi');
+  } else if (m === 4 && d === 17 && y === 2025) {
+    // ← give Nicole her own year (or any date she'll remember)
+    unlock('luna');
   } else {
     loginError.classList.add('show');
     mEl.value = ''; dEl.value = ''; yEl.value = '';
@@ -216,6 +228,7 @@ function tryLogin() {
     setTimeout(() => loginError.classList.remove('show'), 3200);
   }
 }
+
 loginBtn.addEventListener('click', tryLogin);
 [mEl, dEl, yEl].forEach(el => { el.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); }); });
 
@@ -381,3 +394,54 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     playing = !playing;
   });
 })();
+
+
+// ── HEARTBEAT ──────────────────────────────────────
+const TOPI_KEY  = 'topi_last_visit';
+const LUNA_KEY  = 'luna_last_visit';
+
+// Detect who is visiting based on the login name or a flag you set after login
+// Since you already have a login screen, set this after a correct login:
+// localStorage.setItem('current_visitor', 'topi') or 'luna'
+
+function fmtDiff(mins) {
+  if (mins < 1)   return 'just now';
+  if (mins < 60)  return `${Math.round(mins)} minute${Math.round(mins)===1?'':'s'} ago`;
+  const h = Math.floor(mins / 60), m = Math.round(mins % 60);
+  if (h < 24)     return m > 0 ? `${h} hr ${m} min ago` : `${h} hour${h===1?'':'s'} ago`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? 'yesterday' : `${d} days ago`;
+}
+
+function renderPerson(key, name, elId, dotId, msgId) {
+  const last = localStorage.getItem(key);
+  const el   = document.getElementById(elId);
+  const dot  = document.getElementById(dotId);
+  const msg  = document.getElementById(msgId);
+  if (!last || !el) return;
+  const mins = (Date.now() - parseInt(last)) / 60000;
+  el.textContent = `${name} was here ${fmtDiff(mins)}`;
+  if (mins < 60) {
+    dot.style.background = '#D4537E';
+    msg.textContent = 'just dropped by';
+  } else if (mins < 720) {
+    dot.style.background = '#EF9F27';
+    msg.textContent = 'was here a while ago';
+  } else {
+    dot.style.background = '#888780';
+    msg.textContent = 'has been missed';
+  }
+}
+
+function updateHeartbeat() {
+  renderPerson(TOPI_KEY, 'Topi', 'hbTimeTopi', 'hbDotTopi', 'hbMsgTopi');
+  renderPerson(LUNA_KEY, 'Luna', 'hbTimeLuna', 'hbDotLuna', 'hbMsgLuna');
+}
+
+// Stamp the current visitor on page load
+const visitor = localStorage.getItem('current_visitor');
+if (visitor === 'topi') localStorage.setItem(TOPI_KEY, Date.now().toString());
+if (visitor === 'luna') localStorage.setItem(LUNA_KEY, Date.now().toString());
+
+updateHeartbeat();
+setInterval(updateHeartbeat, 30000);
