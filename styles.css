@@ -534,12 +534,12 @@ body.night .jar-fill-bar { background: linear-gradient(90deg, #c8a8e8, #9060c0);
   font-style: italic; color: var(--mocha);
   font-size: .95rem; padding: 1rem 0;
 }
+
 .wish-item-card {
-  background: rgba(107, 78, 57, 0.45); /* was rgba(255,255,255,.55) via --card-bg */
-  border: 1px solid rgba(176,137,104,.2);
-  border-radius: 6px; padding: .55rem .85rem;
-  display: flex; gap: .5rem; align-items: flex-start;
-  animation: wish-card-in .45s cubic-bezier(.34,1.5,.64,1) both;
+  background: rgba(247, 240, 233, 0.1);
+  border: 1px solid rgba(247, 240, 233, 0.18);
+  border-radius: 10px;
+  padding: .65rem .9rem;
 }
 
 body.night .wish-item-card { border-color: rgba(160,120,240,.2); }
@@ -547,55 +547,35 @@ body.night .wish-item-card { border-color: rgba(160,120,240,.2); }
   from { opacity:0; transform:translateY(8px) scale(.97); }
   to   { opacity:1; transform:none; }
 }
-.wish-dot-mark {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: #c98a7d; flex-shrink: 0; margin-top: 6px;
-  transition: background 2s ease;
-}
+.wish-dot-mark { background: rgba(247, 240, 233, 0.5); }
 body.night .wish-dot-mark { background: #c8a8e8; }
-.wish-text-body {
-  flex: 1; font-style: italic; font-size: 1rem;
-  color: #f7f0e9;
-  line-height: 1.5;
-}
-.wish-date-stamp {
-  font-size: .68rem; color: var(--gold);
-  font-style: normal; white-space: nowrap; margin-top: 2px;
-}
+.wish-text-body { color: #f7f0e9; }
+.wish-date-stamp { color: rgba(247, 240, 233, 0.5); }
 .wish-input-row { display: flex; gap: .6rem; align-items: stretch; }
 .wish-textarea {
-  flex: 1;
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic; font-size: 1rem;
-  background: rgba(255,255,255,.6);
-  border: 1px solid rgba(176,137,104,.35);
-  border-radius: 5px; padding: .6rem .85rem;
-  color: var(--espresso); outline: none;
-  resize: none; line-height: 1.4;
-  transition: border-color .3s, box-shadow .3s, background 2s ease, color 2s ease;
+  background: rgba(247, 240, 233, 0.1);
+  border: 1px solid rgba(247, 240, 233, 0.2);
+  color: #f7f0e9;
+}
+.wish-textarea::placeholder { color: rgba(247, 240, 233, 0.35); }
+.wish-textarea:focus {
+  border-color: rgba(247, 240, 233, 0.4);
+  background: rgba(247, 240, 233, 0.14);
+  box-shadow: none;
 }
 body.night .wish-textarea {
   background: rgba(255,255,255,.06);
   border-color: rgba(160,120,240,.3); color: var(--text);
 }
-.wish-textarea::placeholder { color: var(--gold); }
-.wish-textarea:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(176,137,104,.12);
-}
+
 body.night .wish-textarea:focus { box-shadow: 0 0 0 3px rgba(160,120,240,.15); }
 .wish-add-btn {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: .88rem; letter-spacing: .14em;
-  text-transform: uppercase;
-  background: linear-gradient(135deg, var(--mocha), var(--mocha-deep));
-  color: var(--cream); border: none; border-radius: 5px;
-  padding: 0 1.3rem; cursor: pointer;
-  transition: transform .25s, box-shadow .25s;
-  white-space: nowrap; flex-shrink: 0;
+  background: rgba(247, 240, 233, 0.15);
+  border: 1px solid rgba(247, 240, 233, 0.25);
+  color: #f7f0e9;
 }
+.wish-add-btn:hover { background: rgba(247, 240, 233, 0.22); box-shadow: none; }
 body.night .wish-add-btn { background: linear-gradient(135deg, #6030a8, #3a1880); }
-.wish-add-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -6px rgba(90,63,45,.4); }
 .wish-add-btn:active { transform: scale(.97); }
 .wish-status {
   font-size: .72rem; letter-spacing: .16em;
@@ -612,28 +592,22 @@ body.night .wish-add-btn { background: linear-gradient(135deg, #6030a8, #3a1880)
 }
 
 .wish-right {
-  width: 320px;
-  text-align: left;
-
-  background: rgba(107, 78, 57, 0.45);  /* was var(--card-bg) */
-  border: 1px solid rgba(176,137,104,.2);
-  border-radius: 10px;
-
-  padding: 1rem;
-  min-height: 260px;
-  color: #f7f0e9;  /* add this */
+  background: rgba(107, 78, 57, 0.42);
+  border: 1px solid rgba(247, 240, 233, 0.15);
+  border-radius: 14px;
+  padding: 1.4rem 1.4rem 1rem;
+}
+.wish-right h3 {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.6rem;
+  color: #f7f0e9;
+  letter-spacing: .04em;
 }
 
 body.night .wish-right {
   border-color: rgba(160,120,240,.2);
 }
 
-.wish-right h3 {
-  margin: 0 0 1rem;
-  text-align: center;
-  font-family: 'Cormorant Garamond', serif;
-  color: #f7f0e9;  /* add this */
-}
 
 #wishHiddenList {
   display: flex;
