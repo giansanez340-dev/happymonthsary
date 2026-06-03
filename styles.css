@@ -553,36 +553,26 @@ body.night .wish-dot-mark { background: #c8a8e8; }
 .wish-date-stamp { color: rgba(247, 240, 233, 0.5); }
 .wish-input-row { display: flex; gap: .6rem; align-items: stretch; }
 .wish-textarea {
-  background: rgba(247, 240, 233, 0.1);
-  border: 1px solid rgba(247, 240, 233, 0.2);
-  border-radius: 5px;
-  padding: .6rem .85rem;
-  color: #f7f0e9;
-  outline: none;
-  resize: none;
+  flex: 1;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic; font-size: 1rem;
+  background: rgba(255,255,255,.6);
+  border: 1px solid rgba(176,137,104,.35);
+  border-radius: 5px; padding: .6rem .85rem;
+  color: var(--espresso); outline: none;
+  resize: none; line-height: 1.4;
+  transition: border-color .3s, box-shadow .3s, background 2s ease, color 2s ease;
 }
-
-.wish-textarea::placeholder {
-  color: rgba(247, 240, 233, 0.4);
-}
-
-.wish-textarea:focus {
-  border-color: rgba(247, 240, 233, 0.4);
-  background: rgba(247, 240, 233, 0.14);
-  box-shadow: none;
-}
-
 body.night .wish-textarea {
   background: rgba(255,255,255,.06);
   border-color: rgba(160,120,240,.3); color: var(--text);
 }
-
-body.night .wish-textarea:focus { box-shadow: 0 0 0 3px rgba(160,120,240,.15); }
-.wish-add-btn {
-  background: rgba(247, 240, 233, 0.15);
-  border: 1px solid rgba(247, 240, 233, 0.25);
-  color: #f7f0e9;
+.wish-textarea::placeholder { color: var(--gold); }
+.wish-textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(176,137,104,.12);
 }
+body.night .wish-textarea:focus { box-shadow: 0 0 0 3px rgba(160,120,240,.15); }
 .wish-add-btn:hover { background: rgba(247, 240, 233, 0.22); box-shadow: none; }
 body.night .wish-add-btn { background: linear-gradient(135deg, #6030a8, #3a1880); }
 .wish-add-btn:active { transform: scale(.97); }
@@ -645,24 +635,13 @@ body.night .hidden-wish-item {
   margin-bottom: .6rem;
   font-family: 'Cormorant Garamond', serif;
   font-size: 1rem;
-  background: rgba(247, 240, 233, 0.1);
-  border: 1px solid rgba(247, 240, 233, 0.2);
+  background: rgba(255,255,255,.6);
+  border: 1px solid rgba(176,137,104,.35);
   border-radius: 5px;
   padding: .6rem .85rem;
-  color: #f7f0e9;
+  color: var(--espresso);
   outline: none;
 }
-
-.wish-name-input::placeholder {
-  color: rgba(247, 240, 233, 0.4);
-}
-
-.wish-name-input:focus {
-  border-color: rgba(247, 240, 233, 0.4);
-  background: rgba(247, 240, 233, 0.14);
-  box-shadow: none;
-}
-
 body.night .wish-name-input {
   background: rgba(255,255,255,.06);
   border-color: rgba(160,120,240,.3);
