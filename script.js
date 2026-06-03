@@ -451,6 +451,13 @@ setInterval(updateHeartbeat, 30000);
 /* ════════════════════════════════
    MOOD PILLS
 ════════════════════════════════ */
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
 const MOODS = [
   { label: 'Happy'       },
   { label: 'Sad'         },
@@ -486,14 +493,15 @@ function buildMoodPills(containerId, storageKey, who) {
   const saved = localStorage.getItem(storageKey);
 
   // restore heart color on load
-  if (saved && MOOD_COLORS[saved]) {
-    setTimeout(() => {
-      const heartEl = document.getElementById(containerId)
-        ?.closest('.hb-row')
-        ?.querySelector('.hb-heart');
-      if (heartEl) heartEl.style.color = who === 'luna' ? '#D4537E' : '#6495ED';
-    }, 0);
-  }
+   if (saved && MOOD_COLORS[saved]) {
+     setTimeout(() => {
+       const row = document.getElementById(containerId)?.closest('.hb-row');
+       const heartEl = row?.querySelector('.hb-heart');
+       const rings = row?.querySelectorAll('.hb-ring');
+       if (heartEl) heartEl.style.color = MOOD_COLORS[saved];
+       if (rings) rings.forEach(r => r.style.background = hexToRgba(MOOD_COLORS[saved], 0.12));
+     }, 0);
+   }
 
   const savedEl = document.createElement('p');
   savedEl.className = 'hb-mood-saved';
@@ -512,19 +520,26 @@ function buildMoodPills(containerId, storageKey, who) {
       pill.style.cursor = 'default';
     }
 
-    pill.addEventListener('click', () => {
-      if (localStorage.getItem('current_visitor') !== who) return;
-      localStorage.setItem(storageKey, mood.label);
-      container.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
-      pill.classList.add('selected');
-
-      const heartEl = container.closest('.hb-row').querySelector('.hb-heart');
-      if (heartEl) heartEl.style.color = MOOD_COLORS[mood.label] || '#D4537E';
-
-      savedEl.textContent = 'mood saved ✦';
-      savedEl.classList.add('show');
-      setTimeout(() => savedEl.classList.remove('show'), 2000);
-    });
+      pill.addEventListener('click', () => {
+        if (localStorage.getItem('current_visitor') !== who) return;
+        localStorage.setItem(storageKey, mood.label);
+        container.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
+        pill.classList.add('selected');
+      
+        const heartEl = container.closest('.hb-row').querySelector('.hb-heart');
+        const color = MOOD_COLORS[mood.label] || (who === 'luna' ? '#D4537E' : '#6495ED');
+        if (heartEl) heartEl.style.color = color;
+      
+        // ── update ripple rings to match ──
+        const rings = container.closest('.hb-row').querySelectorAll('.hb-ring');
+        rings.forEach(ring => {
+          ring.style.background = hexToRgba(color, 0.12);
+        });
+      
+        savedEl.textContent = 'mood saved ✦';
+        savedEl.classList.add('show');
+        setTimeout(() => savedEl.classList.remove('show'), 2000);
+      });
 
     container.appendChild(pill);
   });
