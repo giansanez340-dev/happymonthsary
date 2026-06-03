@@ -535,12 +535,13 @@ body.night .jar-fill-bar { background: linear-gradient(90deg, #c8a8e8, #9060c0);
   font-size: .95rem; padding: 1rem 0;
 }
 .wish-item-card {
-  background: var(--card-bg);
+  background: rgba(107, 78, 57, 0.45); /* was rgba(255,255,255,.55) via --card-bg */
   border: 1px solid rgba(176,137,104,.2);
   border-radius: 6px; padding: .55rem .85rem;
   display: flex; gap: .5rem; align-items: flex-start;
   animation: wish-card-in .45s cubic-bezier(.34,1.5,.64,1) both;
 }
+
 body.night .wish-item-card { border-color: rgba(160,120,240,.2); }
 @keyframes wish-card-in {
   from { opacity:0; transform:translateY(8px) scale(.97); }
@@ -554,7 +555,8 @@ body.night .wish-item-card { border-color: rgba(160,120,240,.2); }
 body.night .wish-dot-mark { background: #c8a8e8; }
 .wish-text-body {
   flex: 1; font-style: italic; font-size: 1rem;
-  color: var(--text); line-height: 1.5;
+  color: #f7f0e9;
+  line-height: 1.5;
 }
 .wish-date-stamp {
   font-size: .68rem; color: var(--gold);
