@@ -18,6 +18,203 @@
 
   let stars=[], wishes=[], animId, animStart=null;
 
+  /* ── WISH MODAL ── */
+  function createWishModal() {
+    if (document.getElementById('wishModal')) return;
+    const overlay = document.createElement('div');
+    overlay.id = 'wishModalOverlay';
+    overlay.innerHTML = `
+      <div id="wishModal" role="dialog" aria-modal="true" aria-labelledby="wishModalAuthor">
+        <button id="wishModalClose" aria-label="Close wish">×</button>
+        <div class="wm-stars" aria-hidden="true">
+          <span>✦</span><span>✦</span><span>✦</span>
+        </div>
+        <div class="wm-author-wrap">
+          <span class="wm-label">A wish from</span>
+          <span class="wm-author" id="wishModalAuthor"></span>
+        </div>
+        <div class="wm-rule"></div>
+        <p class="wm-text" id="wishModalText"></p>
+        <div class="wm-rule"></div>
+        <span class="wm-date" id="wishModalDate"></span>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const style = document.createElement('style');
+    style.textContent = `
+      #wishModalOverlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(15, 5, 30, 0.72);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      #wishModalOverlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+      #wishModal {
+        position: relative;
+        background: linear-gradient(145deg, #fdf6ee, #f5e8d8);
+        border: 1px solid rgba(176,137,104,0.35);
+        border-radius: 20px;
+        padding: 2.8rem 2.4rem 2.2rem;
+        max-width: 420px;
+        width: 90%;
+        box-shadow:
+          0 30px 80px rgba(0,0,0,0.22),
+          0 0 0 1px rgba(255,255,255,0.15) inset;
+        transform: translateY(22px) scale(0.96);
+        transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+        opacity: 0;
+        text-align: center;
+      }
+      body.night #wishModal {
+        background: linear-gradient(145deg, #1a0e2e, #120928);
+        border-color: rgba(160,120,240,0.3);
+      }
+      #wishModalOverlay.open #wishModal {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      #wishModalClose {
+        position: absolute;
+        top: 1rem;
+        right: 1.1rem;
+        background: none;
+        border: none;
+        font-size: 1.6rem;
+        cursor: pointer;
+        color: #c98a7d;
+        line-height: 1;
+        padding: 0;
+        transition: transform 0.2s, color 0.2s;
+      }
+      #wishModalClose:hover { transform: scale(1.2); color: #c4785e; }
+      .wm-stars {
+        display: flex;
+        justify-content: center;
+        gap: 0.55rem;
+        margin-bottom: 1.2rem;
+      }
+      .wm-stars span {
+        font-size: 0.7rem;
+        color: #d4907a;
+        animation: wm-twinkle 2.4s ease-in-out infinite;
+      }
+      .wm-stars span:nth-child(2) { animation-delay: 0.8s; }
+      .wm-stars span:nth-child(3) { animation-delay: 1.6s; }
+      @keyframes wm-twinkle {
+        0%, 100% { opacity: 0.4; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.35); }
+      }
+      .wm-label {
+        display: block;
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 0.78rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #c98a7d;
+        margin-bottom: 0.3rem;
+      }
+      body.night .wm-label { color: #a070d0; }
+      .wm-author {
+        display: block;
+        font-family: 'Dancing Script', cursive;
+        font-size: 1.9rem;
+        font-weight: 600;
+        color: #7a4a38;
+        line-height: 1.2;
+      }
+      body.night .wm-author { color: #c8a0f0; }
+      .wm-rule {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #d4907a55, transparent);
+        margin: 1.1rem auto;
+        width: 70%;
+      }
+      body.night .wm-rule {
+        background: linear-gradient(90deg, transparent, #a070d055, transparent);
+      }
+      .wm-text {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 1.22rem;
+        font-style: italic;
+        line-height: 1.8;
+        color: #5a3828;
+        margin: 0;
+        padding: 0 0.5rem;
+      }
+      body.night .wm-text { color: #e0caf8; }
+      .wm-date {
+        font-family: 'Cormorant Garamond', Georgia, serif;
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        color: #b8957a;
+        opacity: 0.75;
+      }
+      body.night .wm-date { color: #9070c0; }
+
+      /* Make wish items clickable */
+      .hidden-wish-item {
+        cursor: pointer;
+        transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+        user-select: none;
+      }
+      .hidden-wish-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(176,137,104,0.22);
+      }
+      body.night .hidden-wish-item:hover {
+        box-shadow: 0 6px 20px rgba(120,80,220,0.22);
+      }
+      .hidden-wish-item .wm-peek {
+        display: block;
+        font-size: 0.72rem;
+        font-style: italic;
+        opacity: 0.55;
+        margin-top: 0.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+      }
+    `;
+    document.head.appendChild(style);
+
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) closeWishModal();
+    });
+    document.getElementById('wishModalClose').addEventListener('click', closeWishModal);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeWishModal();
+    });
+  }
+
+  function openWishModal(wish) {
+    const overlay = document.getElementById('wishModalOverlay');
+    if (!overlay) return;
+    document.getElementById('wishModalAuthor').textContent = wish.name || 'Someone';
+    document.getElementById('wishModalText').textContent = wish.text;
+    document.getElementById('wishModalDate').textContent = fmt(wish.ts);
+    overlay.classList.add('open');
+    document.getElementById('wishModalClose').focus();
+  }
+
+  function closeWishModal() {
+    const overlay = document.getElementById('wishModalOverlay');
+    if (overlay) overlay.classList.remove('open');
+  }
+  /* ── END MODAL ── */
+
   function initElements() {
     canvas   = document.getElementById('wishCanvas');
     if (!canvas) return false;
@@ -181,27 +378,29 @@
 
   function renderHiddenList(ws){
     if(!hiddenList) return;
-
     hiddenList.innerHTML='';
 
     if(!ws.length){
-      hiddenList.innerHTML = `
-        <div class="hidden-wish-item">
-          No wishes yet ✦
-        </div>
-      `;
+      hiddenList.innerHTML = `<div class="hidden-wish-item">No wishes yet ✦</div>`;
       return;
     }
 
-    [...ws].reverse().forEach(w=>{
-      const item=document.createElement('div');
-
-      item.className='hidden-wish-item';
-
-      item.innerHTML=`
-      ${w.name || 'Someone'}'s Wish
+    [...ws].reverse().forEach((w, i)=>{
+      const item = document.createElement('div');
+      item.className = 'hidden-wish-item';
+      // Truncated peek text
+      const peek = w.text.length > 38 ? w.text.slice(0, 38) + '…' : w.text;
+      item.innerHTML = `
+        <span>${w.name || 'Someone'}'s Wish</span>
+        <span class="wm-peek">${peek}</span>
       `;
-
+      item.setAttribute('role', 'button');
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('aria-label', `Open wish from ${w.name || 'Someone'}`);
+      item.addEventListener('click', () => openWishModal(w));
+      item.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openWishModal(w); }
+      });
       hiddenList.appendChild(item);
     });
   }
@@ -209,21 +408,13 @@
   // Google Sheets Integration
   async function syncWishToSheet(wish){
     try{
-      const payload = {
-        name: wish.name,
-        text: wish.text,
-        timestamp: wish.ts
-      };
-
-      const response = await fetch(GOOGLE_SHEETS_URL, {
+      const payload = { name: wish.name, text: wish.text, timestamp: wish.ts };
+      await fetch(GOOGLE_SHEETS_URL, {
         method: 'POST',
         mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
       console.log('Wish synced to Google Sheets');
       return true;
     }catch(err){
@@ -235,46 +426,30 @@
   function addWish(){
     const name = nameInput.value.trim();
     const text = textarea.value.trim();
-
     if(!name || !text){
       status.textContent='Please enter your name and a wish.';
       return;
     }
-
     addBtn.disabled=true;
     status.textContent='Saving…';
-
     try{
-      const ts=new Date().toISOString();
+      const ts = new Date().toISOString();
       const newWish = { name, text, ts };
-
-      // Add new wish to in-memory array
       wishes.push(newWish);
-
-      // Sync to Google Sheets
       syncWishToSheet(newWish);
-
       renderList(wishes);
       renderHiddenList(wishes);
-
       updateFillUI(wishes.length);
-      buildStars(wishes.length,false);
+      buildStars(wishes.length, false);
       loopFall();
-
       nameInput.value='';
       textarea.value='';
-
       status.textContent='Wish saved ✦';
-
-      setTimeout(()=>{
-        status.textContent='';
-      },2500);
-
+      setTimeout(()=>{ status.textContent=''; }, 2500);
     }catch(err){
       console.error(err);
       status.textContent='Could not save wish. Please try again.';
     }
-
     addBtn.disabled=false;
     textarea.focus();
   }
@@ -286,19 +461,18 @@
       return;
     }
 
-    addBtn.addEventListener('click',addWish);
-    textarea.addEventListener('keydown',e=>{
-      if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();addWish();}
+    createWishModal();
+
+    addBtn.addEventListener('click', addWish);
+    textarea.addEventListener('keydown', e=>{
+      if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); addWish(); }
     });
 
     drawJar();
-
-    // Start with empty wishes array (no localStorage)
     wishes = [];
     updateFillUI(0);
   }
 
-  // Wait for DOM to be ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
