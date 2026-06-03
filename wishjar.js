@@ -7,9 +7,9 @@
 
   let canvas, ctx, fillBar, fillLbl, listWrap, textarea, addBtn, status, nameInput, hiddenList;
 
-  const W=200, H=260;
-  const JX=30, JY=40, JW=140, JH=195, JR=22;
-  const LX=38, LY=22, LW=124, LH=22, LR=6;
+  const W=200, H=290;  // was H=260
+  const JX=30, JY=70, JW=140, JH=195, JR=22;  // JY was 40
+  const LX=38, LY=52, LW=124, LH=22, LR=6;    // LY was 22
   const FILL_BOT=JY+JH-12, FILL_TOP=JY+10;
   const FILL_H=FILL_BOT-FILL_TOP;
   const MAX_STARS=60;
