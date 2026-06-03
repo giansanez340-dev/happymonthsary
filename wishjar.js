@@ -221,7 +221,7 @@
     ctx      = canvas.getContext('2d');
     fillBar  = document.getElementById('jarFillBar');
     fillLbl  = document.getElementById('jarFillLabel');
-    listWrap = document.getElementById('wishListWrap');
+    listWrap = document.getElementById('wishListWrap'); if(listWrap) listWrap.style.display='none';
     textarea = document.getElementById('wishTextarea');
     addBtn   = document.getElementById('wishAddBtn');
     status   = document.getElementById('wishStatus');
@@ -432,7 +432,7 @@
       const newWish = { name, text, ts };
       wishes.push(newWish);
       syncWishToSheet(newWish);
-      renderList(wishes);
+      
       renderHiddenList(wishes);
       updateFillUI(wishes.length);
       buildStars(wishes.length, false);
@@ -481,7 +481,7 @@
       if(Array.isArray(data) && data.length){
         wishes = data.filter(w => w.name && w.text && w.ts);
         console.log('[WishJar] loaded wishes:', wishes.length);
-        renderList(wishes);
+        
         renderHiddenList(wishes);
         updateFillUI(wishes.length);
         buildStars(wishes.length, true);
