@@ -473,20 +473,21 @@
 
   async function loadWishes(){
     try{
-      status.textContent = 'Loading wishes…';
-      const res = await fetch(GOOGLE_SHEETS_URL, { method: 'GET' });
-      const data = await res.json();
+      const res = await fetch(GOOGLE_SHEETS_URL + '?action=get');
+      const text = await res.text();
+      console.log('[WishJar] raw response:', text);
+      const data = JSON.parse(text);
+      console.log('[WishJar] parsed:', data);
       if(Array.isArray(data) && data.length){
         wishes = data.filter(w => w.name && w.text && w.ts);
+        console.log('[WishJar] loaded wishes:', wishes.length);
         renderList(wishes);
         renderHiddenList(wishes);
         updateFillUI(wishes.length);
         buildStars(wishes.length, true);
       }
-      status.textContent = '';
     }catch(err){
-      console.error('Failed to load wishes:', err);
-      status.textContent = '';
+      console.error('[WishJar] Failed to load wishes:', err);
     }
   }
 
