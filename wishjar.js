@@ -12,7 +12,7 @@
   const LX=38, LY=22, LW=124, LH=22, LR=6;
   const FILL_BOT=JY+JH-12, FILL_TOP=JY+10;
   const FILL_H=FILL_BOT-FILL_TOP;
-  const MAX_STARS=40;
+  const MAX_STARS=60;
   const COLORS=['#e8b4a0','#d4907a','#c98a7d','#e8c8a8','#d4aa88',
                 '#f0d4c0','#c4785e','#e0b090','#dda888','#f5c8a8'];
 
@@ -291,7 +291,7 @@
     ctx.fillStyle='rgba(255,255,255,0.22)'; ctx.fill();
   }
 
-  function fillRatio(n){ return n===0?0:Math.min(0.08+n*0.055,0.96); }
+  function fillRatio(n){ return n===0?0:Math.min(0.05+n*0.0091,0.96); }
 
   function updateFillUI(n){
     const r=fillRatio(n);
