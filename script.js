@@ -452,41 +452,45 @@ setInterval(updateHeartbeat, 30000);
    MOOD PILLS
 ════════════════════════════════ */
 const MOODS = [
-  { label: 'Grateful'},
-  { label: 'Content'},
-  { label: 'Romantic'},
-  { label: 'Flirtatious'},
-  { label: 'Loving'},
-  { label: 'Sleepy'},
-  { label: 'Cuddly'},
+  { label: 'Grateful'    },
+  { label: 'Content'     },
+  { label: 'Romantic'    },
+  { label: 'Flirtatious' },
+  { label: 'Loving'      },
+  { label: 'Sleepy'      },
+  { label: 'Cuddly'      },
 ];
+
 const MOOD_COLORS = {
-  'Grateful':    '#f0a868',  // warm amber
-  'Content':     '#88b4d4',  // soft blue
-  'Romantic':    '#c8607c',  // deep rose
-  'Flirtatious': '#d47ab0',  // playful pink
-  'Loving':      '#e8547a',  // bright pink-red
-  'Sleepy':      '#9080c0',  // muted lavender
-  'Cuddly':      '#d4907a',  // cozy terracotta
+  'Grateful':    '#f0a868',
+  'Content':     '#88b4d4',
+  'Romantic':    '#c8607c',
+  'Flirtatious': '#d47ab0',
+  'Loving':      '#e8547a',
+  'Sleepy':      '#9080c0',
+  'Cuddly':      '#d4907a',
 };
 
 const TOPI_MOOD_KEY = 'topi_mood';
 const LUNA_MOOD_KEY = 'luna_mood';
 
-const saved = localStorage.getItem(storageKey);
+function buildMoodPills(containerId, storageKey, who) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
 
-// restore heart color on load
-if (saved && MOOD_COLORS[saved]) {
-  setTimeout(() => {
-    const heartEl = document.querySelector(`#${containerId}`)
-      ?.closest('.hb-row')
-      ?.querySelector('.hb-heart');
-    if (heartEl) heartEl.style.color = MOOD_COLORS[saved];
-  }, 0);
-}
   const saved = localStorage.getItem(storageKey);
 
-  // saved label display
+  // restore heart color on load
+  if (saved && MOOD_COLORS[saved]) {
+    setTimeout(() => {
+      const heartEl = document.getElementById(containerId)
+        ?.closest('.hb-row')
+        ?.querySelector('.hb-heart');
+      if (heartEl) heartEl.style.color = MOOD_COLORS[saved];
+    }, 0);
+  }
+
   const savedEl = document.createElement('p');
   savedEl.className = 'hb-mood-saved';
   savedEl.id = containerId + 'Status';
@@ -497,7 +501,6 @@ if (saved && MOOD_COLORS[saved]) {
     pill.textContent = mood.label;
     pill.setAttribute('aria-label', mood.label);
 
-    // only the current visitor can change their own mood
     const currentVisitor = localStorage.getItem('current_visitor');
     if (currentVisitor !== who) {
       pill.disabled = true;
@@ -505,20 +508,25 @@ if (saved && MOOD_COLORS[saved]) {
       pill.style.cursor = 'default';
     }
 
-pill.addEventListener('click', () => {
-  if (localStorage.getItem('current_visitor') !== who) return;
-  localStorage.setItem(storageKey, mood.label);
-  container.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
-  pill.classList.add('selected');
+    pill.addEventListener('click', () => {
+      if (localStorage.getItem('current_visitor') !== who) return;
+      localStorage.setItem(storageKey, mood.label);
+      container.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
+      pill.classList.add('selected');
 
-  // ── change heart color based on mood ──
-  const heartEl = container.closest('.hb-row').querySelector('.hb-heart');
-  if (heartEl) heartEl.style.color = MOOD_COLORS[mood.label] || '#D4537E';
+      const heartEl = container.closest('.hb-row').querySelector('.hb-heart');
+      if (heartEl) heartEl.style.color = MOOD_COLORS[mood.label] || '#D4537E';
 
-  savedEl.textContent = 'mood saved ✦';
-  savedEl.classList.add('show');
-  setTimeout(() => savedEl.classList.remove('show'), 2000);
-});
+      savedEl.textContent = 'mood saved ✦';
+      savedEl.classList.add('show');
+      setTimeout(() => savedEl.classList.remove('show'), 2000);
+    });
+
+    container.appendChild(pill);
+  });
+
+  container.appendChild(savedEl);
+}
 
 function buildAllMoods() {
   buildMoodPills('hbMoodsTopi', TOPI_MOOD_KEY, 'topi');
