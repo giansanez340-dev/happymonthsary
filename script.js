@@ -40,7 +40,6 @@ function applyTheme(mode) {
 }
 
 applyTheme(getTimeOfDay());
-// re-check every minute in case she leaves the tab open across sunset/sunrise
 setInterval(() => applyTheme(getTimeOfDay()), 60000);
 
 function makeStars(n) {
@@ -77,24 +76,20 @@ function spawnShooter() {
 function drawMoon() {
   const mx = canvas.width * 0.82, my = canvas.height * 0.12;
   const r = 38;
-  // glow
   const grd = ctx.createRadialGradient(mx, my, r * 0.5, mx, my, r * 3.5);
   grd.addColorStop(0, 'rgba(220,210,255,0.18)');
   grd.addColorStop(0.4, 'rgba(180,160,240,0.07)');
   grd.addColorStop(1, 'transparent');
   ctx.beginPath(); ctx.arc(mx, my, r * 3.5, 0, Math.PI * 2);
   ctx.fillStyle = grd; ctx.fill();
-  // moon body
   const mg = ctx.createRadialGradient(mx - r*0.3, my - r*0.3, r*0.1, mx, my, r);
   mg.addColorStop(0, '#f8f4ff');
   mg.addColorStop(0.5, '#e8e0f8');
   mg.addColorStop(1, '#c8b8e8');
   ctx.beginPath(); ctx.arc(mx, my, r, 0, Math.PI * 2);
   ctx.fillStyle = mg; ctx.fill();
-  // crescent shadow
   ctx.beginPath(); ctx.arc(mx + r * 0.35, my - r * 0.1, r * 0.88, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(7,9,26,0.82)'; ctx.fill();
-  // craters
   [[mx - 12, my + 8, 4], [mx - 4, my - 14, 3], [mx - 20, my - 2, 2.5]].forEach(([cx,cy,cr]) => {
     ctx.beginPath(); ctx.arc(cx, cy, cr, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(180,160,220,0.25)'; ctx.fill();
@@ -105,8 +100,6 @@ function nightLoop(t) {
   if (!isNight) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const time = t * 0.001;
-
-  // stars
   stars.forEach(s => {
     const a = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(time * s.speed * 6 + s.phase));
     ctx.beginPath();
@@ -114,7 +107,6 @@ function nightLoop(t) {
     ctx.fillStyle = s.color;
     ctx.globalAlpha = a;
     ctx.fill();
-    // tiny cross sparkle for bigger stars
     if (s.r > 1.1) {
       ctx.globalAlpha = a * 0.4;
       ctx.strokeStyle = s.color;
@@ -126,8 +118,6 @@ function nightLoop(t) {
     }
   });
   ctx.globalAlpha = 1;
-
-  // shooting stars
   shooters = shooters.filter(s => s.alpha > 0.01);
   shooters.forEach(s => {
     s.progress += s.speed;
@@ -143,7 +133,6 @@ function nightLoop(t) {
     ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey);
     ctx.strokeStyle = grad; ctx.lineWidth = 1.5; ctx.stroke();
   });
-
   drawMoon();
   nightFrame = requestAnimationFrame(nightLoop);
 }
@@ -157,7 +146,6 @@ function startNightSky() {
   shooterInterval = setInterval(() => {
     if (Math.random() < 0.5) spawnShooter();
   }, 4000);
-  // fireflies
   buildFireflies();
 }
 function stopNightSky() {
@@ -187,6 +175,52 @@ function buildFireflies() {
 }
 
 /* ════════════════════════════════
+   HEARTBEAT
+════════════════════════════════ */
+const TOPI_KEY = 'topi_last_visit';
+const LUNA_KEY = 'luna_last_visit';
+
+function fmtDiff(mins) {
+  if (mins < 1)  return 'just now';
+  if (mins < 60) return `${Math.round(mins)} minute${Math.round(mins) === 1 ? '' : 's'} ago`;
+  const h = Math.floor(mins / 60), m = Math.round(mins % 60);
+  if (h < 24)    return m > 0 ? `${h} hr ${m} min ago` : `${h} hour${h === 1 ? '' : 's'} ago`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? 'yesterday' : `${d} days ago`;
+}
+
+function renderPerson(key, name, elId, dotId, msgId) {
+  const last = localStorage.getItem(key);
+  const el   = document.getElementById(elId);
+  const dot  = document.getElementById(dotId);
+  const msg  = document.getElementById(msgId);
+  if (!el) return;
+  if (!last) {
+    el.textContent  = `${name} hasn't visited yet`;
+    if (dot) dot.style.background = '#888780';
+    if (msg) msg.textContent = '';
+    return;
+  }
+  const mins = (Date.now() - parseInt(last)) / 60000;
+  el.textContent = `${name} was here ${fmtDiff(mins)}`;
+  if (mins < 60) {
+    dot.style.background = name === 'Luna' ? '#6495ED' : '#D4537E';
+    msg.textContent = 'just dropped by ♥';
+  } else if (mins < 720) {
+    dot.style.background = '#EF9F27';
+    msg.textContent = 'was here a while ago';
+  } else {
+    dot.style.background = '#888780';
+    msg.textContent = 'has been missed';
+  }
+}
+
+function updateHeartbeat() {
+  renderPerson(TOPI_KEY, 'Topi', 'hbTimeTopi', 'hbDotTopi', 'hbMsgTopi');
+  renderPerson(LUNA_KEY, 'Luna', 'hbTimeLuna', 'hbDotLuna', 'hbMsgLuna');
+}
+
+/* ════════════════════════════════
    LOGIN
 ════════════════════════════════ */
 const loginScreen = document.getElementById('loginScreen');
@@ -203,23 +237,24 @@ autoTab(mEl, dEl); autoTab(dEl, yEl);
 
 function unlock(who) {
   localStorage.setItem('current_visitor', who);
-  // stamp their visit immediately
-  const key = who === 'luna' ? 'luna_last_visit' : 'topi_last_visit';
+  const key = who === 'luna' ? LUNA_KEY : TOPI_KEY;
   localStorage.setItem(key, Date.now().toString());
   loginScreen.classList.add('hide');
   loginError.classList.remove('show');
-  setTimeout(() => { loginScreen.style.display = 'none'; updateHeartbeat(); }, 900);
+  setTimeout(() => {
+    loginScreen.style.display = 'none';
+    updateHeartbeat();
+  }, 900);
 }
 
 function tryLogin() {
   const m = parseInt(mEl.value, 10);
   const d = parseInt(dEl.value, 10);
   const y = parseInt(yEl.value, 10);
-
   if (m === 4 && d === 17 && y === 2026) {
     unlock('topi');
   } else if (m === 4 && d === 17 && y === 2025) {
-    // ← give Nicole her own year (or any date she'll remember)
+    // Nicole's (Luna's) secret date — change this to any date she'll remember
     unlock('luna');
   } else {
     loginError.classList.add('show');
@@ -230,7 +265,9 @@ function tryLogin() {
 }
 
 loginBtn.addEventListener('click', tryLogin);
-[mEl, dEl, yEl].forEach(el => { el.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); }); });
+[mEl, dEl, yEl].forEach(el => {
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+});
 
 /* ════════════════════════════════
    COUNTDOWN
@@ -267,8 +304,8 @@ const flowers = [
   { emoji:"🌺", name:"Hibiscus",       msg:"In the language of flowers, the hibiscus generally represents delicate beauty, hospitality, and deep affection." },
   { emoji:"🪷", name:"Lotus",          msg:"The lotus flower in love symbolizes resilience, pure devotion, and a bond that thrives amidst adversity." },
   { emoji:"💐", name:"A Bouquet",      msg:"In the language of love, a bouquet symbolizes the sender's unsaid emotions, representing passion, care, and devotion." },
-  { emoji:"🪻", name:"Hyacinth",       msg:"In love, hyacinths generally symbolize sincerity, deep emotional attachment, and constancy. " },
-  { emoji:"🌼", name:"Sunflower",      msg:"In love, sunflowers symbolize unwavering loyalty, deep adoration, and steadfast devotion. " },
+  { emoji:"🪻", name:"Hyacinth",       msg:"In love, hyacinths generally symbolize sincerity, deep emotional attachment, and constancy." },
+  { emoji:"🌼", name:"Sunflower",      msg:"In love, sunflowers symbolize unwavering loyalty, deep adoration, and steadfast devotion." },
 ];
 const poems = [
   { label:"Dear Babu,", text:"You still shine even when the sky turns cloudy. You always bloom even when the rain starts to pour. And you always keep people warm when the weather turns cold." },
@@ -305,7 +342,7 @@ fOverlay.addEventListener('click', e => { if (e.target === fOverlay) closeFlower
 const pOverlay = document.getElementById('pOverlay');
 const pClose   = document.getElementById('pClose');
 for (let i = 0; i < 4; i++) {
-  const env = document.getElementById('env-' + i);
+  const env  = document.getElementById('env-' + i);
   const hint = document.getElementById('hint-' + i);
   function makeHandler(idx, el, hintEl) {
     return function() {
@@ -352,17 +389,15 @@ const io = new IntersectionObserver(entries => {
 }, { threshold: .12 });
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  /* ════════════════════════════════
+/* ════════════════════════════════
    VINYL PLAYER
 ════════════════════════════════ */
 (function() {
-  const player  = document.getElementById('vinylPlayer');
-  const btn     = document.getElementById('vinylBtn');
-  const icon    = document.getElementById('vinylPauseIcon');
-  const frame   = document.getElementById('ytFrame');
-  let ytReady   = false, playing = false, ytPlayer;
+  const player = document.getElementById('vinylPlayer');
+  const btn    = document.getElementById('vinylBtn');
+  const icon   = document.getElementById('vinylPauseIcon');
+  let ytReady  = false, playing = false, ytPlayer;
 
-  // Load YouTube IFrame API
   const tag = document.createElement('script');
   tag.src = 'https://www.youtube.com/iframe_api';
   document.head.appendChild(tag);
@@ -395,53 +430,10 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   });
 })();
 
-
-// ── HEARTBEAT ──────────────────────────────────────
-const TOPI_KEY  = 'topi_last_visit';
-const LUNA_KEY  = 'luna_last_visit';
-
-// Detect who is visiting based on the login name or a flag you set after login
-// Since you already have a login screen, set this after a correct login:
-// localStorage.setItem('current_visitor', 'topi') or 'luna'
-
-function fmtDiff(mins) {
-  if (mins < 1)   return 'just now';
-  if (mins < 60)  return `${Math.round(mins)} minute${Math.round(mins)===1?'':'s'} ago`;
-  const h = Math.floor(mins / 60), m = Math.round(mins % 60);
-  if (h < 24)     return m > 0 ? `${h} hr ${m} min ago` : `${h} hour${h===1?'':'s'} ago`;
-  const d = Math.floor(h / 24);
-  return d === 1 ? 'yesterday' : `${d} days ago`;
-}
-
-function renderPerson(key, name, elId, dotId, msgId) {
-  const last = localStorage.getItem(key);
-  const el   = document.getElementById(elId);
-  const dot  = document.getElementById(dotId);
-  const msg  = document.getElementById(msgId);
-  if (!last || !el) return;
-  const mins = (Date.now() - parseInt(last)) / 60000;
-  el.textContent = `${name} was here ${fmtDiff(mins)}`;
-  if (mins < 60) {
-    dot.style.background = '#D4537E';
-    msg.textContent = 'just dropped by';
-  } else if (mins < 720) {
-    dot.style.background = '#EF9F27';
-    msg.textContent = 'was here a while ago';
-  } else {
-    dot.style.background = '#888780';
-    msg.textContent = 'has been missed';
-  }
-}
-
-function updateHeartbeat() {
-  renderPerson(TOPI_KEY, 'Topi', 'hbTimeTopi', 'hbDotTopi', 'hbMsgTopi');
-  renderPerson(LUNA_KEY, 'Luna', 'hbTimeLuna', 'hbDotLuna', 'hbMsgLuna');
-}
-
-// Stamp the current visitor on page load
-const visitor = localStorage.getItem('current_visitor');
-if (visitor === 'topi') localStorage.setItem(TOPI_KEY, Date.now().toString());
-if (visitor === 'luna') localStorage.setItem(LUNA_KEY, Date.now().toString());
-
+/* ════════════════════════════════
+   INITIAL HEARTBEAT RENDER
+   (no stamping here — stamping
+   only happens inside unlock())
+════════════════════════════════ */
 updateHeartbeat();
 setInterval(updateHeartbeat, 30000);
