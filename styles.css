@@ -633,6 +633,8 @@ body.night .wish-add-btn { background: linear-gradient(135deg, #6030a8, #3a1880)
   padding: 1rem;
   display: flex;
   flex-direction: column;
+  max-height: 480px;   /* add this */
+  overflow: hidden;    /* add this */
 }
 
 body.night .wish-right {
@@ -651,6 +653,12 @@ body.night .wish-right {
   display: flex;
   flex-direction: column;
   gap: .5rem;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: #d4aa88 transparent;
+  padding-right: 0.3rem;
+  min-height: 0;       /* add this — critical for flex scroll to work */
 }
 
 #wishHiddenList {
