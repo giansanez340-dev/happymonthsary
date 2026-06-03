@@ -35,28 +35,32 @@
 <div class="petals" id="petals" aria-hidden="true"></div>
 <div class="petals" id="fireflies" aria-hidden="true"></div>
 
-  <!--LOGIN PAGE-->
-<div class="login-box">
-  <span class="login-petal" id="loginIcon">🌸</span>
-  <h1 class="login-title">For You, Nicole</h1>
-  <p class="login-sub">This website created by me,<br>was made just for you, babu.</p>
-
-  <!-- WHO ARE YOU -->
-  <div class="login-who">
-    <button class="who-btn active" id="whoTopi" onclick="selectWho('topi')">🌸 Topi</button>
-    <button class="who-btn" id="whoLuna" onclick="selectWho('luna')">🌙 Luna</button>
+<!-- ── LOGIN SCREEN ── -->
+<div id="loginScreen">
+  <div class="login-blobs">
+    <div class="login-blob login-blob-1"></div>
+    <div class="login-blob login-blob-2"></div>
   </div>
+  <div class="login-box">
+    <span class="login-petal" id="loginIcon">🌸</span>
+    <h1 class="login-title">For You, Nicole</h1>
+    <p class="login-sub">This website created by me,<br>was made just for you, babu.</p>
 
-  <span class="login-hint">Enter our special date to open</span>
-  <div class="login-inputs">
-    <input type="text" id="loginMonth" placeholder="MM" maxlength="2" inputmode="numeric" aria-label="Month" />
-    <input type="text" id="loginDay"   placeholder="DD" maxlength="2" inputmode="numeric" aria-label="Day" />
-    <input type="text" id="loginYear"  placeholder="YYYY" maxlength="4" inputmode="numeric" aria-label="Year" />
+    <div class="login-who">
+      <button class="who-btn active" id="whoTopi" onclick="selectWho('topi')">🌸 Topi</button>
+      <button class="who-btn" id="whoLuna" onclick="selectWho('luna')">🌙 Luna</button>
+    </div>
+
+    <span class="login-hint">Enter our special date to open</span>
+    <div class="login-inputs">
+      <input type="text" id="loginMonth" placeholder="MM" maxlength="2" inputmode="numeric" aria-label="Month" />
+      <input type="text" id="loginDay"   placeholder="DD" maxlength="2" inputmode="numeric" aria-label="Day" />
+      <input type="text" id="loginYear"  placeholder="YYYY" maxlength="4" inputmode="numeric" aria-label="Year" />
+    </div>
+    <button class="login-btn" id="loginBtn">Open ♡</button>
+    <p class="login-error" id="loginError">Bakit mo nakalimutan babu :< One more pweaseee</p>
   </div>
-  <button class="login-btn" id="loginBtn">Open ♡</button>
-  <p class="login-error" id="loginError">Bakit mo nakalimutan babu :< One more pweaseee</p>
 </div>
-
 <!-- HERO -->
 <section class="hero">
   <p class="hero-eyebrow">For my sweetest babu</p>
