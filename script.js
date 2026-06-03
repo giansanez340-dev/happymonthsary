@@ -207,21 +207,36 @@ async function pushPresence(who) {
   } catch(e) {}
 }
 
+async function pushMood(who, mood) {
+  try {
+    await fetch(`${SHEETS_URL}?who=${who}&mood=${encodeURIComponent(mood)}`, {
+      method: 'GET',
+      mode: 'no-cors',
+    });
+  } catch(e) {}
+}
+
 async function fetchPresence() {
   try {
-    const res  = await fetch(SHEETS_URL, {
-      method: 'GET',
-      redirect: 'follow',
-    });
+    const res  = await fetch(SHEETS_URL, { method: 'GET', redirect: 'follow' });
     const text = await res.text();
     const data = JSON.parse(text);
-    if (data.topi) window._presence.topi = parseInt(data.topi);
-    if (data.luna) window._presence.luna = parseInt(data.luna);
+
+    if (data.topi) {
+      window._presence.topi = parseInt(data.topi.ts) || 0;
+      if (data.topi.mood !== undefined) localStorage.setItem(TOPI_MOOD_KEY, data.topi.mood);
+    }
+    if (data.luna) {
+      window._presence.luna = parseInt(data.luna.ts) || 0;
+      if (data.luna.mood !== undefined) localStorage.setItem(LUNA_MOOD_KEY, data.luna.mood);
+    }
   } catch(e) {
     console.warn('fetchPresence failed:', e);
   }
   updateHeartbeat();
+  buildAllMoods();
 }
+
 function renderPerson(who, isMe) {
   const name  = who === 'topi' ? 'Topi' : 'Luna';
   const ts    = window._presence[who] || 0;
@@ -585,6 +600,7 @@ function buildMoodPills(containerId, storageKey, who) {
     pill.addEventListener('click', () => {
       if (localStorage.getItem('current_visitor') !== who) return;
       localStorage.setItem(storageKey, mood.label);
+      pushMood(who, mood.label); 
       container.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
       pill.classList.add('selected');
 
@@ -614,6 +630,7 @@ function buildMoodPills(containerId, storageKey, who) {
   clearBtn.addEventListener('click', () => {
     if (localStorage.getItem('current_visitor') !== who) return;
     localStorage.removeItem(storageKey);
+     pushMood(who, ''); 
     container.querySelectorAll('.mood-pill').forEach(p => p.classList.remove('selected'));
 
     const row = container.closest('.hb-row');
