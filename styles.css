@@ -695,7 +695,7 @@ body.night .wish-name-input {
 }
 .hb-ring {
   position: absolute; width: 64px; height: 64px; border-radius: 50%;
-  background: rgba(212,83,126,.12);
+  background: rgba(100,149,237,.12);
   animation: hb-ripple 2s ease-out infinite;
 }
 .hb-ring-2 { animation-delay: 0.7s; }
