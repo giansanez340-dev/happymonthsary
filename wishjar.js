@@ -551,8 +551,9 @@
     const newBtn = confirmBtn.cloneNode(true);
     confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
     newBtn.addEventListener('click', () => {
+      const pending = _pendingDelete;
       closeDeleteModal();
-      if (_pendingDelete) confirmDeleteWish(_pendingDelete.wish, _pendingDelete.itemEl);
+      if (pending) confirmDeleteWish(pending.wish, pending.itemEl);
     });
 
     document.getElementById('wdCancel').focus();
