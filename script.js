@@ -284,7 +284,6 @@ function renderPerson(who, isMe) {
      } else {
        title.textContent = `${otherName} was here`;
      }
-   }
 
    const sub = document.getElementById('moodSubtitle');
      if (sub && me) {
@@ -298,6 +297,21 @@ function renderPerson(who, isMe) {
        }
      }
    }
+  const tsEl = document.getElementById('moodTimestamp');
+  if (tsEl && me) {
+    const otherTs = window._presence[other] || 0;
+    if (!otherTs) {
+      tsEl.textContent = '';
+    } else if (isOnline(other)) {
+      const now = new Date();
+      tsEl.textContent = 'as of ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else {
+      const d = new Date(otherTs);
+      tsEl.textContent = 'last seen ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        + ' · ' + d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+  }
+}
 /* ════════════════════════════════
    LOGIN
 /* ════════════════════════════════
