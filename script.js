@@ -235,6 +235,14 @@ function autoTab(el, next) {
 }
 autoTab(mEl, dEl); autoTab(dEl, yEl);
 
+let selectedWho = 'topi';
+
+function selectWho(who) {
+  selectedWho = who;
+  document.getElementById('whoTopi').classList.toggle('active', who === 'topi');
+  document.getElementById('whoLuna').classList.toggle('active', who === 'luna');
+}
+
 function unlock(who) {
   localStorage.setItem('current_visitor', who);
   const key = who === 'luna' ? LUNA_KEY : TOPI_KEY;
@@ -247,21 +255,13 @@ function unlock(who) {
   }, 900);
 }
 
-let selectedWho = 'topi'; // default
-
-function selectWho(who) {
-  selectedWho = who;
-  document.getElementById('whoTopi').classList.toggle('active', who === 'topi');
-  document.getElementById('whoLuna').classList.toggle('active', who === 'luna');
-}
-
 function tryLogin() {
   const m = parseInt(mEl.value, 10);
   const d = parseInt(dEl.value, 10);
   const y = parseInt(yEl.value, 10);
 
   const topiDate = m === 4 && d === 17 && y === 2026;
-  const lunaDate = m === 4 && d === 17 && y === 2025; // Nicole's secret date
+  const lunaDate = m === 4 && d === 17 && y === 2025;
 
   if ((selectedWho === 'topi' && topiDate) || (selectedWho === 'luna' && lunaDate)) {
     unlock(selectedWho);
@@ -272,6 +272,11 @@ function tryLogin() {
     setTimeout(() => loginError.classList.remove('show'), 3200);
   }
 }
+
+loginBtn.addEventListener('click', tryLogin);
+[mEl, dEl, yEl].forEach(el => {
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+});
 
 /* ════════════════════════════════
    COUNTDOWN
