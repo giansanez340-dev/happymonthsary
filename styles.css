@@ -354,19 +354,34 @@ body.night .env-body::before { background: linear-gradient(168deg,#2a1858,#180c4
   background-size:50% 58%, 50% 58%; background-position:left bottom, right bottom; background-repeat:no-repeat;
 }
 body.night .env-body::after { background: linear-gradient(135deg, #1a0e3a 50%, transparent 50%), linear-gradient(-135deg, #1a0e3a 50%, transparent 50%); background-size:50% 58%, 50% 58%; background-position:left bottom, right bottom; background-repeat:no-repeat; }
-.env-letter { position:absolute; bottom:8%; left:8%; right:8%; height:44%; background:#fdf8f2; border-radius:2px; border:1px solid rgba(176,137,104,.18); z-index:2; display:flex; align-items:center; justify-content:center; transform:translateY(0); transition:transform .55s .15s cubic-bezier(.34,1.2,.64,1), background 2s ease; box-shadow:0 2px 8px rgba(90,63,45,.12); }
+.env-letter { position:absolute; bottom:8%; left:8%; right:8%; height:44%; background:#fdf8f2; border-radius:2px; border:1px solid rgba(176,137,104,.18); z-index:2; display:flex; align-items:center; justify-content:center; transform:translateY(0); transition: transform .55s .15s cubic-bezier(.34,1.2,.64,1), background 2s ease; box-shadow:0 2px 8px rgba(90,63,45,.12); }
 body.night .env-letter { background: #0e0824; border-color: rgba(160,120,240,.2); }
 .env-letter span { font-family:'Dancing Script',cursive; font-size:.85rem; color:var(--gold); letter-spacing:.05em; transition: color 2s ease; }
 .envelope.open .env-letter { transform:translateY(-58%); }
 .env-seal { position:absolute; bottom:10%; left:50%; transform:translateX(-50%); z-index:4; width:36px; height:36px; background:radial-gradient(circle at 38% 35%, #d4998b, #7a3a30); border-radius:50%; border:2px solid rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font-size:.9rem; color:rgba(255,255,255,.8); box-shadow:0 3px 10px rgba(80,30,20,.35); transition:opacity .4s ease, background 2s ease; }
 body.night .env-seal { background: radial-gradient(circle at 38% 35%, #9060d0, #4020a0); box-shadow: 0 3px 16px rgba(100,60,220,.5), 0 0 20px rgba(140,100,255,.3); }
 .envelope.open .env-seal { opacity:0; pointer-events:none; }
-.env-flap { position:absolute; top:0; left:0; right:0; height:54%; background:linear-gradient(172deg,#e8d2bc,#cba882); clip-path:polygon(0% 0%, 50% 100%, 100% 0%); transform-origin:top center; transform-style:preserve-3d; transition:transform .6s cubic-bezier(.4,0,.2,1), background 2s ease; z-index:5; }
+.env-flap { position:absolute; top:0; left:0; right:0; height:54%; background:linear-gradient(172deg,#e8d2bc,#cba882); clip-path:polygon(0% 0%, 50% 100%, 100% 0%); transform-origin:top center; transform-style:preserve-3d; transition: transform 0.6s cubic-bezier(.4,0,.2,1), background 2s ease;}
 body.night .env-flap { background: linear-gradient(172deg,#261450,#160a38); }
 .envelope.open .env-flap { transform:rotateX(-180deg); }
 .env-label { letter-spacing:.22em; text-transform:uppercase; font-size:.62rem; font-weight:300; color:var(--gold); transition: color 2s ease; }
 .env-hint { font-size:.6rem; letter-spacing:.16em; text-transform:uppercase; color:var(--gold-light); transition:opacity .4s, color 2s ease; }
 .envelope.open ~ .env-hint { opacity:0; }
+
+.envelope:hover .env-flap {
+  transform: rotateX(-140deg);
+  transition: transform 0.5s cubic-bezier(.4,0,.2,1);
+}
+
+.envelope:hover .env-letter {
+  transform: translateY(-40%);
+  transition: transform 0.5s 0.2s cubic-bezier(.34,1.2,.64,1);
+}
+
+.envelope:hover .env-seal {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
 
 /* ── CLOTHESLINE PHOTOS ── */
 .clothesline-section {
