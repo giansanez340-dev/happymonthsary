@@ -375,17 +375,42 @@ body.night .env-flap { background: linear-gradient(172deg,#261450,#160a38); }
   margin-bottom: 4.5rem;
   padding-top: 44px;
 }
+
+/* ── CLOTHESLINE ROPE (curved via SVG) ── */
 .clothesline-rope {
+  display: none; /* replaced by SVG rope below */
+}
+
+.rope-svg {
   position: absolute;
-  top: 16px;
+  top: 0;
   left: -2%;
   width: 104%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #c8a87a 3%, #b8944a 20%, #c8a87a 50%, #b8944a 80%, #c8a87a 97%, transparent);
-  border-radius: 2px;
+  height: 44px;
   z-index: 1;
-  box-shadow: 0 1px 4px rgba(90,60,20,.3);
+  overflow: visible;
 }
+
+/* Night mode: bulbs glow purple/warm */
+body.night .rope-svg path { stroke: #6040a0; }
+body.night .rope-svg rect  { fill: #3a1880; }
+body.night .rope-svg line  { stroke: #6040a0; }
+
+/* Twinkling animation */
+.rope-svg ellipse[rx="12"] {
+  animation: bulb-twinkle 3s ease-in-out infinite;
+}
+.rope-svg g:nth-child(3) ellipse[rx="12"] { animation-delay: 0.5s; }
+.rope-svg g:nth-child(4) ellipse[rx="12"] { animation-delay: 1.1s; }
+.rope-svg g:nth-child(5) ellipse[rx="12"] { animation-delay: 0.3s; }
+.rope-svg g:nth-child(6) ellipse[rx="12"] { animation-delay: 1.7s; }
+.rope-svg g:nth-child(7) ellipse[rx="12"] { animation-delay: 0.8s; }
+
+@keyframes bulb-twinkle {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1;   }
+}
+
 body.night .clothesline-rope {
   background: linear-gradient(90deg, transparent, #6040a0 3%, #8060c0 20%, #6040a0 50%, #8060c0 80%, #6040a0 97%, transparent);
   box-shadow: 0 1px 6px rgba(100,60,200,.4);
