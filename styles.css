@@ -155,10 +155,13 @@ body.night .petal { opacity: 0 !important; animation-play-state: paused; }
   width: 100vw !important;
   height: 100vh !important;
   z-index: 9999 !important;
-  background: #f5e8df !important;
+  background: var(--bg) !important;   /* ← was hardcoded #f5e8df */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+}
+body.night #loginScreen {
+  background: #0a071f !important;
 }
 #loginScreen.hide {
   opacity: 0 !important;
