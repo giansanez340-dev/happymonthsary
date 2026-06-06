@@ -345,7 +345,14 @@
   .envelope.open ~ .env-hint { opacity:0; }
 
   /* Photos */
-  .photo-stack { display:flex; justify-content:center; align-items:flex-end; gap:2rem; flex-wrap:wrap; margin-top:1rem; }
+.photo-stack {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2rem;
+  flex-wrap: wrap;   /* already have this */
+  margin-top: 1rem;
+}
   .photo { background:#fff; padding:12px 12px 44px; box-shadow:0 18px 48px -12px rgba(90,63,45,.38); width:200px; transition:transform .45s cubic-bezier(.34,1.4,.64,1), background 2s ease, box-shadow 2s ease; }
   body.night .photo { background: #1a1030; box-shadow: 0 18px 60px -12px rgba(80,40,200,.5), 0 0 40px rgba(120,80,220,.15); }
   .photo:nth-child(1) { transform:rotate(-4.5deg); }
