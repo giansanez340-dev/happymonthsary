@@ -432,7 +432,9 @@ body.night .clothesline-rope {
   flex-direction: column;
   align-items: center;
   z-index: 2;
+  margin-top: -14px; /* pull photo-hang up so clothespin sits on rope */
 }
+
 .clothespin {
   position: relative;
   z-index: 10;
@@ -440,6 +442,7 @@ body.night .clothesline-rope {
   height: 30px;
   flex-shrink: 0;
   margin-bottom: -4px;
+  margin-top: 0px; /* reset any offset */
 }
 
 /* ── POLAROID ── */
