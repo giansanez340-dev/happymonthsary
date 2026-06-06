@@ -432,7 +432,7 @@ body.night .clothesline-rope {
   flex-direction: column;
   align-items: center;
   z-index: 2;
-  margin-top: -22px; /* pull photo-hang up so clothespin sits on rope */
+  margin-top: -24px; /* pull photo-hang up so clothespin sits on rope */
 }
 
 .clothespin {
