@@ -435,6 +435,11 @@ body.night .clothesline-rope {
   margin-top: -24px; /* pull photo-hang up so clothespin sits on rope */
 }
 
+.photo-hang:nth-child(3),
+.photo-hang:nth-child(4) {
+  margin-top: -38px; /* more negative = higher up */
+}
+
 .clothespin {
   position: relative;
   z-index: 10;
