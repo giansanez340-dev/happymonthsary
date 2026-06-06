@@ -345,15 +345,63 @@
   .envelope.open ~ .env-hint { opacity:0; }
 
   /* Photos */
-.photo-stack {
+.clothesline-section {
+  position: relative;
+  padding: 3rem 0 4rem;
+  overflow: visible;
+}
+
+.clothesline-row {
+  position: relative;
+  margin-bottom: 3.5rem;
+  padding-top: 30px;
+}
+
+.clothesline-rope {
+  position: absolute;
+  top: 14px;
+  left: -2%;
+  width: 104%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #c8a87a 3%, #b8944a 20%, #c8a87a 50%, #b8944a 80%, #c8a87a 97%, transparent);
+  border-radius: 2px;
+  z-index: 1;
+  box-shadow: 0 1px 3px rgba(90,60,20,.25);
+}
+
+.clothesline-photos {
   display: flex;
   justify-content: center;
-  align-items: flex-end;
-  gap: 2rem;
-  flex-wrap: wrap;   /* already have this */
-  margin-top: 1rem;
+  gap: 1.8rem;
+  flex-wrap: nowrap;
+  padding-top: 8px;
 }
-  .photo { background:#fff; padding:12px 12px 44px; box-shadow:0 18px 48px -12px rgba(90,63,45,.38); width:200px; transition:transform .45s cubic-bezier(.34,1.4,.64,1), background 2s ease, box-shadow 2s ease; }
+
+.photo-hang {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.clothespin {
+  position: absolute;
+  top: -14px;
+  z-index: 10;
+  width: 18px;
+  height: 28px;
+}
+
+.photo-hang .photo {
+  margin-top: 10px;
+  transform-origin: top center;
+  transition: transform .45s cubic-bezier(.34,1.4,.64,1), box-shadow .3s;
+}
+
+.photo-hang:nth-child(odd) .photo  { transform: rotate(-3deg); }
+.photo-hang:nth-child(even) .photo { transform: rotate(2.5deg); }
+.photo-hang:hover .photo           { transform: rotate(0deg) scale(1.06) !important; }
   body.night .photo { background: #1a1030; box-shadow: 0 18px 60px -12px rgba(80,40,200,.5), 0 0 40px rgba(120,80,220,.15); }
   .photo:nth-child(1) { transform:rotate(-4.5deg); }
   .photo:nth-child(2) { transform:rotate(3deg); }
